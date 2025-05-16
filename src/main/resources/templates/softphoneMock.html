@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script src="/htmx-1.9.12/dist/htmx.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div th:if="${buttons eq null}" class="login">
+    <form>
+        <label for="username"><b>Username</b></label>
+        <input type="text" value="Testagent" name="username" required>
+        <button hx-post="/agent/softphone/login" hx-target=".login" type="submit">Login</button>
+    </form>
+</div>
+
+<div th:if="${buttons ne null}" th:fragment="buttons" class="softphone">
+
+    <div>Agent State: <span th:text="${state}"></span></div>
+
+    <div th:each="button : ${buttons}" class="button">
+        <button
+                th:name="action"
+                th:value="${button.value.getName()}"
+                th:text="${button.value.getLabel()}"
+                th:disabled="${!button.value.isEnabled()}"
+                hx-post="/agent/softphone/action"
+                hx-trigger="click"
+                hx-target=".softphone"
+        />
+    </div>
+</div>
+</body>
+
+</html>
