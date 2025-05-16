@@ -8,15 +8,15 @@
 
 <div th:if="${buttons eq null}" class="login">
     <form>
-        <label for="username"><b>Username</b></label>
-        <input type="text" value="Testagent" name="username" required>
-        <button hx-post="/agent/softphone/login" hx-target=".login" type="submit">Login</button>
+        <input type="text" name="username" value="Testagent" required>
+        <button hx-post="/login" hx-target=".login" hx-params="username" type="submit">Login</button>
     </form>
 </div>
 
 <div th:if="${buttons ne null}" th:fragment="buttons" class="softphone">
 
-    <div>Agent State: <span th:text="${state}"></span></div>
+    <div>Agent Name: <span th:text="${usersession.getUsername()}"></span></div>
+    <div>Agent State: <span th:text="${usersession.getState()}"></span></div>
 
     <div th:each="button : ${buttons}" class="button">
         <button
@@ -24,11 +24,19 @@
                 th:value="${button.value.getName()}"
                 th:text="${button.value.getLabel()}"
                 th:disabled="${!button.value.isEnabled()}"
-                hx-post="/agent/softphone/action"
+                hx-post="/softphone/action"
                 hx-trigger="click"
                 hx-target=".softphone"
         />
     </div>
+
+    <button th:disabled="${(usersession.getState() ne usersession.getState().NOT_READY)}"
+            hx-post="/logout"
+            hx-trigger="click"
+            hx-target=".softphone"
+    >Logout
+    </button>
+
 </div>
 </body>
 

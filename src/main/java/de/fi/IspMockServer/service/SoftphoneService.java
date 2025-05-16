@@ -102,4 +102,8 @@ public class SoftphoneService {
 
         return buttonPanel;
     }
+
+    public void removeButtonPanel(String sessionId) {
+        softphones.remove(sessionId);
+    }
 }

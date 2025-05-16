@@ -18,59 +18,48 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/agent")
-public class AgentController {
+@RequestMapping("/softphone")
+public class SoftphoneController {
 
     private SoftphoneService softphoneService;
     private SessionService sessionService;
 
     @Autowired
-    public AgentController(SoftphoneService softphoneService, SessionService sessionService) {
+    public SoftphoneController(SoftphoneService softphoneService, SessionService sessionService) {
         this.softphoneService = softphoneService;
         this.sessionService = sessionService;
     }
 
-    @GetMapping("/softphone") // intern
+    @GetMapping() // intern
     public String home(Model model, HttpServletRequest httpServletRequest) {
         final HttpSession session = httpServletRequest.getSession(false);
         if (session != null) {
-            final String sessionId = session.getId() + session.getAttribute("username");
+            final String sessionId = (String) session.getAttribute("userSessionId");
             final UserSession userSession = sessionService.findUserSession(sessionId);
             if (userSession != null) {
                 model.addAttribute("buttons", softphoneService.getButtonPanel(userSession));
-                model.addAttribute("state", userSession.getState());
+                model.addAttribute("usersession", userSession);
             }
         }
         return "softphoneMock";
     }
 
-    @PostMapping("/softphone/login") //intern
-    public String login(Model model, HttpServletRequest httpServletRequest, @RequestBody String username) {
-        final HttpSession session = httpServletRequest.getSession(true);
-        session.setAttribute("username", username);
-        final String sessionId = session.getId() + username;
-        final UserSession userSession = sessionService.initiateSession(sessionId, username);
-        model.addAttribute("buttons", softphoneService.setupButtonpanel(userSession));
-        model.addAttribute("state", userSession.getState());
-        return "softphoneMock";
-    }
-
-    @PostMapping("/softphone/action") //intern
+    @PostMapping("/action") //intern
     public String action(Model model, HttpServletRequest httpServletRequest, @RequestParam String action) {
         final HttpSession session = httpServletRequest.getSession(false);
         if (session != null) {
-            final String sessionId = session.getId() + session.getAttribute("username");
+            final String sessionId = (String) session.getAttribute("userSessionId");
             final UserSession userSession = sessionService.findUserSession(sessionId);
             if (userSession != null) {
                 final Function function = Function.valueOf(action);
                 model.addAttribute("buttons", softphoneService.handleAction(userSession, function));
-                model.addAttribute("state", userSession.getState());
+                model.addAttribute("usersession", userSession);
             }
         }
         return "softphoneMock";
     }
 
-    @PostMapping("/softphone/event") //extern
+    @PostMapping("/event") //extern
     public String event(@RequestBody String event) {
         final String sessionId = "dummyId";
         final UserSession userSession = sessionService.findUserSession(sessionId);

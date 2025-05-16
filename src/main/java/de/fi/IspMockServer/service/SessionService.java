@@ -36,4 +36,8 @@ public class SessionService {
         userSessions.put(sessionId, userSession);
         return userSession;
     }
+
+    public void removeSession(String sessionId) {
+        userSessions.remove(sessionId);
+    }
 }
