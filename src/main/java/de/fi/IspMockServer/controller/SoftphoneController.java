@@ -90,8 +90,4 @@ public class SoftphoneController {
         return String.format("SessionId: %s existiert nicht.", sessionId);
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "answerButton";
-    }
 }
