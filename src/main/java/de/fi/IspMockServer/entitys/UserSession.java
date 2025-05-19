@@ -2,7 +2,7 @@ package de.fi.IspMockServer.entitys;
 
 public class UserSession {
 
-    private String id;
+    private String sessionId;
     private String username;
     private State state;
 
@@ -10,13 +10,13 @@ public class UserSession {
      * Initial State: NOT_READY
      */
     public UserSession(String sessionId, String username) {
-        this.id = sessionId;
+        this.sessionId = sessionId;
         this.username = username;
         this.state = State.NOT_READY;
     }
 
     public String getSessionId() {
-        return id;
+        return sessionId;
     }
 
     public String getUsername() {

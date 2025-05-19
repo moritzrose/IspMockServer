@@ -29,20 +29,22 @@ public class AuthenticationController {
     @PostMapping("/login") //intern
     public String login(Model model, HttpServletRequest httpServletRequest, @RequestParam String username) {
         final HttpSession session = httpServletRequest.getSession(true);
-        final String sessionId = session.getId() + username;
-        session.setAttribute("userSessionId", sessionId);
+        final String sessionId = username;
+        session.setAttribute("sessionId", sessionId);
         final UserSession userSession = sessionService.initiateSession(sessionId, username);
         model.addAttribute("buttons", softphoneService.setupButtonpanel(userSession));
-        model.addAttribute("usersession", userSession);
+        model.addAttribute("userSession", userSession);
         return "softphoneMock";
     }
 
     @PostMapping("/logout") //intern
     public String logout(Model model, HttpServletRequest httpServletRequest) {
         final HttpSession session = httpServletRequest.getSession(false);
-        final String sessionId = (String) session.getAttribute("userSessionId");
+        final String sessionId = (String) session.getAttribute("sessionId");
         sessionService.removeSession(sessionId);
         softphoneService.removeButtonPanel(sessionId);
+        SseController.emitter.get(sessionId).complete();
+        SseController.emitter.remove(sessionId);
         session.invalidate();
         return "softphoneMock";
     }

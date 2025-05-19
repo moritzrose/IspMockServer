@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <script src="/htmx-1.9.12/dist/htmx.js" crossorigin="anonymous"></script>
+    <script src="/sse/sse.min.js." crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -13,12 +14,16 @@
     </form>
 </div>
 
-<div th:if="${buttons ne null}" th:fragment="buttons" class="softphone">
+<div th:if="${buttons ne null}"
+     th:fragment="buttons"
+     th:attr="hx-sse=@{connect:/sse/ringing/{sessionId}(sessionId=${userSession.getSessionId()})}"
+     class="softphone">
 
-    <div>Agent Name: <span th:text="${usersession.getUsername()}"></span></div>
-    <div>Agent State: <span th:text="${usersession.getState()}"></span></div>
+    <div>Agent Name: <span th:text="${userSession.getUsername()}"></span></div>
+    <div>Agent State: <span th:text="${userSession.getState()}"></span></div>
 
-    <div th:each="button : ${buttons}" class="button">
+    <div th:each="button : ${buttons}"
+         class="button">
         <button
                 th:name="action"
                 th:value="${button.value.getName()}"
@@ -30,7 +35,9 @@
         />
     </div>
 
-    <button th:disabled="${(usersession.getState() ne usersession.getState().NOT_READY)}"
+    <div hx-get="/softphone" hx-trigger="sse:ringing" hx-target=".softphone"></div>
+
+    <button th:disabled="${(userSession.getState() ne userSession.getState().NOT_READY)}"
             hx-post="/logout"
             hx-trigger="click"
             hx-target=".softphone"

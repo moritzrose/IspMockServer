@@ -3,6 +3,7 @@ package de.fi.IspMockServer.service;
 import de.fi.IspMockServer.entitys.Button;
 import de.fi.IspMockServer.entitys.Function;
 import de.fi.IspMockServer.entitys.UserSession;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 public class SoftphoneService {
 
     private static final int INITIAL_STATE = 160; // "Nicht Bereit" ist immer Bit 6, Error-Tester 8
+    private static final int ANSWER_BIT = 2;
     private final Map<String, Object> softphones = new HashMap<>();
 
     public static int[] toBinary(long bitMask, int maxBit) {
@@ -101,6 +103,12 @@ public class SoftphoneService {
         }
 
         return buttonPanel;
+    }
+
+    public void ringing(UserSession userSession){
+        final String sessionId = userSession.getSessionId();
+        final Map<String, Button> softphone = (Map<String, Button>) softphones.get(sessionId);
+        softphone.get(ANSWER_BIT).setEnabled(true);
     }
 
     public void removeButtonPanel(String sessionId) {
