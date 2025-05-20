@@ -6,9 +6,9 @@
   * Erhalten von Antwort
 ### Moritz
 * Erstellen rudimentärer GUI
-  * Annehmen
-  * Auflegen
-  * Statusanzeige (Bereit/Nicht bereit)
+  * &check; Auflegen
+  * &check; Annehmen
+  * &check; Statusanzeige (Bereit/Nicht bereit/ etc.)
 * Abzudeckende Tests:
-  * per Event GUI-Element enabled/disabled setzen/Änderung Statusanzeige
-  * Schicken von Event an Partner
+  * &check; per Event GUI-Element enabled/disabled setzen/Änderung Statusanzeige
+  * Schicken von Http-Request mit Event (Annehmen, Halten, etc.) an externen Partner (Genesys, Huawei, Vier) - API studieren
