@@ -1,7 +1,7 @@
 package de.fi.IspMockServer.entitys;
 
 public enum State {
-    READY(19),
+    READY(17),
     NOT_READY(32),
     CALLING(8),
     IN_CALL(12),
