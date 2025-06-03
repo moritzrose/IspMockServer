@@ -23,7 +23,6 @@ public class AuthenticationController {
     public AuthenticationController(SessionService sessionService, SoftphoneService softphoneService) {
         this.softphoneService = softphoneService;
         this.sessionService = sessionService;
-
     }
 
     @PostMapping("/login") //intern
