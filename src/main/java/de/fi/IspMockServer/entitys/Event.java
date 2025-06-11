@@ -1,14 +1,31 @@
 package de.fi.IspMockServer.entitys;
 
 public class Event {
-    private String sessionId;
-    private String type;
+    private String eventType; //AgentState_Busy
+    private String workNo; //40038
+    private Content content;
 
-    public String getSessionId() {
-        return sessionId;
+    public String getEventType() {
+        return eventType;
     }
 
-    public String getType() {
-        return type;
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getWorkNo() {
+        return workNo;
+    }
+
+    public void setWorkNo(String workNo) {
+        this.workNo = workNo;
+    }
+
+    public Content getContent() {
+        return content;
+    }
+
+    public void setContent(Content content) {
+        this.content = content;
     }
 }

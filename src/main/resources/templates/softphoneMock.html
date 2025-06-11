@@ -21,7 +21,6 @@
 
     <div>Agent Name: <span th:text="${userSession.getUsername()}"></span></div>
     <div>Agent State: <span th:text="${userSession.getState()}"></span></div>
-
     <div th:each="button : ${buttons}"
          class="button">
         <button
@@ -34,7 +33,6 @@
                 hx-target=".softphone"
         />
     </div>
-
     <div hx-get="/softphone" hx-trigger="sse:ringing" hx-target=".softphone"></div>
 
     <button th:disabled="${(userSession.getState() ne userSession.getState().NOT_READY)}"
@@ -44,6 +42,11 @@
     >Logout
     </button>
 
+</div>
+
+<div th:if="${httpResponse ne null}">
+    <h3>Http-Response</h3>
+    <div th:text="${httpResponse}"/>
 </div>
 </body>
 
