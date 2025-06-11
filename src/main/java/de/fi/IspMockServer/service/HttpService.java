@@ -1,7 +1,22 @@
 package de.fi.IspMockServer.service;
 
-import org.springframework.http.HttpStatusCode;
+import de.fi.IspMockServer.entitys.UserSession;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HttpService {
@@ -18,35 +33,121 @@ public class HttpService {
         return httpService;
     }
 
-    public HttpStatusCode initiateCall() {
-        return HttpStatusCode.valueOf(200);
+    /**
+     * <pre>
+     * "caller": "40038",
+     * "called": "40040",
+     * "skillid": 25,
+     * "callappdata": "",
+     * "mediaability": 1,
+     * "userVideoDirection": 4
+     * </pre>
+     */
+    public String initiateCall(UserSession userSession) {
+
+        final String sessionId = userSession.getSessionId();
+
+        final List<NameValuePair> entity = new ArrayList<>();
+        entity.add(new BasicNameValuePair("caller", "40038"));
+        entity.add(new BasicNameValuePair("called", "40040"));
+        entity.add(new BasicNameValuePair("skillid", "25"));
+        entity.add(new BasicNameValuePair("callappdata", ""));
+        entity.add(new BasicNameValuePair("mediaability", "1"));
+        entity.add(new BasicNameValuePair("userVideoDirection", "4"));
+
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+
+            final HttpPut httpPut = new HttpPut(String.format("https://IP address:Port number/agentgateway/resource/voicecall/%s/callout", sessionId));
+            httpPut.setEntity(new UrlEncodedFormEntity(entity));
+
+            try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
+                return EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            return "\"message\": \"\",\n" +
+                    "    \t\"retcode\": \"0\",\n" +
+                    "    \t\"result\": \"1455885056-1095\"\n";
+        }
     }
 
-    public HttpStatusCode answerCall() {
-        return HttpStatusCode.valueOf(200);
+    public String answerCall() {
+        return "\"message\": \"\",\n" +
+                "    \t\"retcode\": \"0\",\n" +
+                "    \t\"result\": \"1455885056-1095\"\n";
     }
 
-    public HttpStatusCode holdCall() {
-        return HttpStatusCode.valueOf(200);
+
+    public String holdCall() {
+        return "\"message\": \"\",\n" +
+                "    \t\"retcode\": \"0\",\n" +
+                "    \t\"result\": \"1455885056-1095\"\n";
     }
 
-    public HttpStatusCode unholdCall() {
-        return HttpStatusCode.valueOf(200);
+    public String unholdCall() {
+        return "\"message\": \"\",\n" +
+                "    \t\"retcode\": \"0\",\n" +
+                "    \t\"result\": \"1455885056-1095\"\n";
     }
 
-    public HttpStatusCode releaseCall() {
-        return HttpStatusCode.valueOf(200);
+    public String releaseCall() {
+        return "\"message\": \"\",\n" +
+                "    \t\"retcode\": \"0\",\n" +
+                "    \t\"result\": \"1455885056-1095\"\n";
     }
 
-    public HttpStatusCode setAgentNotReady() {
-        return HttpStatusCode.valueOf(200);
+    public String setAgentNotReady() {
+        return "\"message\": \"\",\n" +
+                "    \t\"retcode\": \"0\",\n" +
+                "    \t\"result\": \"1455885056-1095\"\n";
     }
 
-    public HttpStatusCode setAgentReady() {
-        return HttpStatusCode.valueOf(200);
+    public String setAgentReady() {
+        return "\"message\": \"\",\n" +
+                "    \t\"retcode\": \"0\",\n" +
+                "    \t\"result\": \"1455885056-1095\"\n";
     }
 
-    public HttpStatusCode errorTester() {
-        return HttpStatusCode.valueOf(404);
+    public Optional<String> login(UserSession userSession) {
+
+        final String sessionId = userSession.getSessionId();
+
+        final List<NameValuePair> entity = new ArrayList<>();
+        entity.add(new BasicNameValuePair("password", ""));
+        entity.add(new BasicNameValuePair("phonenum", "40038"));
+        entity.add(new BasicNameValuePair("status", "4"));
+        entity.add(new BasicNameValuePair("releasephone", "true"));
+        entity.add(new BasicNameValuePair("agenttype", "4"));
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+
+            final HttpPut httpPut = new HttpPut(String.format("https://ip:port/agentgateway/resource/onlineagent/%s", sessionId));
+
+            httpPut.setEntity(new UrlEncodedFormEntity(entity));
+
+            try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
+                return Optional.of(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
+            }
+        } catch (IOException e) {
+            return Optional.of("\"message\": \"\",\n" +
+                    "    \t\"retcode\": \"0\",\n" +
+                    "    \t\"result\": \"1455885056-1095\"\n");
+        }
+    }
+
+    public Optional<String> logOut(String sessionId) {
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+
+            final HttpDelete httpDelete = new HttpDelete(String.format("https://IP address:Port number/agentgateway/resource/onlineagent/%s/logout", sessionId));
+
+            try (CloseableHttpResponse response = httpClient.execute(httpDelete)) {
+                return Optional.of(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
+            }
+        } catch (IOException e) {
+            return Optional.of("\"message\": \"\",\n" +
+                    "    \t\"retcode\": \"0\",\n" +
+                    "    \t\"result\": \"1455885056-1095\"\n");
+        }
     }
 }

@@ -5,6 +5,7 @@ public class UserSession {
     private String sessionId;
     private String username;
     private State state;
+    private String skillId;
 
     /**
      * Initial State: NOT_READY
@@ -12,7 +13,7 @@ public class UserSession {
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
         this.username = username;
-        this.state = State.NOT_READY;
+        this.state = State.PENDING;
     }
 
     public String getSessionId() {
@@ -29,5 +30,9 @@ public class UserSession {
 
     public void setState(State state) {
         this.state = state;
+    }
+
+    public String getSkillId() {
+        return skillId;
     }
 }
