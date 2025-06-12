@@ -2,7 +2,6 @@ package de.fi.IspMockServer.controller;
 
 
 import de.fi.IspMockServer.entitys.Event;
-import de.fi.IspMockServer.entitys.Function;
 import de.fi.IspMockServer.entitys.State;
 import de.fi.IspMockServer.entitys.UserSession;
 import de.fi.IspMockServer.service.SessionService;
@@ -28,7 +27,7 @@ public class SoftphoneController {
     private SessionService sessionService;
 
     @Autowired
-    public SoftphoneController(SoftphoneService softphoneService, SessionService sessionService) {
+    public SoftphoneController(SessionService sessionService, SoftphoneService softphoneService) {
         this.softphoneService = softphoneService;
         this.sessionService = sessionService;
     }
@@ -54,40 +53,25 @@ public class SoftphoneController {
             final String sessionId = (String) session.getAttribute("sessionId");
             final UserSession userSession = sessionService.findUserSession(sessionId);
             if (userSession != null) {
-                final Function function = Function.valueOf(action);
-                model.addAttribute("buttons", softphoneService.handleAction(userSession, function));
+                model.addAttribute("buttons", softphoneService.handleAction(userSession, action));
                 model.addAttribute("userSession", userSession);
             }
         }
         return "softphoneMock";
     }
 
-    @PostMapping("/ringing") //extern
+    @PostMapping("/event") //extern
     @ResponseBody
     public String event(@RequestBody Event event) {
         final String sessionId = event.getSessionId();
         final UserSession userSession = sessionService.findUserSession(sessionId);
         if (userSession != null) {
             if (userSession.getState().equals(State.READY)) {
-                // hole Emitter zur UserSession
-                final SseEmitter ringingEmitter = SseController.emitter.get(sessionId);
-                try {
-                    userSession.setState(State.RINGING);
-                    softphoneService.handleEvent(sessionId, State.RINGING.getBitMask());
-
-                    //.data leer aber notwendig, da sonst hx-trigger: sse:ringing nicht funktioniert
-                    ringingEmitter.send(SseEmitter.event().name("ringing").data(""));
-                    System.out.println(String.format("200: Ringing Event an %s gesendet.", sessionId));
-                } catch (Exception e) {
-                    ringingEmitter.completeWithError(e);
-                    System.out.println(String.format("500: Konnte kein Ringing Event an %s senden.", sessionId));
-                }
-                return String.format("200", event.getType());
+                return softphoneService.handleEvent(event, userSession);
             } else {
                 return String.format("User: %s nicht bereit.", sessionId);
             }
         }
         return String.format("SessionId: %s existiert nicht.", sessionId);
     }
-
 }
