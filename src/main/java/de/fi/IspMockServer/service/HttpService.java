@@ -20,16 +20,17 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class HttpService {
 
-    private static HttpService httpService;
     private static final String URL = "https://178.15.147.134:8043/agentgateway/resource/onlineagent/";
-    private static final String PASSWORD = "2wsx@WSX";
-    private static final String PHONE_NO = "66660190";
+    private static final String AGENT_ID = System.getenv("poc.agentid");
+    private static final String PASSWORD = System.getenv("poc.password");
+    private static final String PHONE_NO = System.getenv("poc.tel");
 
 
     /**
@@ -137,53 +138,44 @@ public class HttpService {
         final String sessionId = userSession.getSessionId();
 
 
-//       {
-//    "password": "2wsx@WSX",
-//    "phonenum": "66660027",
-//    "status": "4",
-//    "releasephone": "true",
-//    "autoanswer": "false",
-//    "agenttype": "4"
-//}
-        final List<NameValuePair> entity = new ArrayList<>();
-        entity.add(new BasicNameValuePair("password", PASSWORD));
-        entity.add(new BasicNameValuePair("phonenum", PHONE_NO));
-        entity.add(new BasicNameValuePair("status", "4"));
-        entity.add(new BasicNameValuePair("releasephone", "true"));
-        entity.add(new BasicNameValuePair("agenttype", "4"));
-
         try {
-            URL url = new URL(URL + 43125);
-            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setRequestMethod("PUT");
-            connection.setRequestProperty("Content-Type", "application/json");
-            String jsonInputString = "{\n" +
-                    "    \"password\": \"2wsx@WSX\",\n" +
-                    "    \"phonenum\": \"66660190\",\n" +
-                    "    \"status\": \"4\",\n" +
-                    "    \"releasephone\": \"true\",\n" +
-                    "    \"agenttype\": \"4\"\n" +
-                    "}";
 
-            connection.setDoOutput(true);
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonInputString.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
+            String requestBody = String.format(
+                    "{" +
+                            "\"password\":\"%s\"," +
+                            "\"phonenum\":\"%s\"," +
+                            "\"status\":\"%s\"," +
+                            "\"releasephone\":\"%s\"," +
+                            "\"agenttype\":\"%s\"}", PASSWORD, PHONE_NO, 4, true, 4);
 
-            try (BufferedReader br = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream(), "utf-8"))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine = null;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                System.out.println(response.toString());
-            }
+            URL url = new URL(URL + AGENT_ID);
+            return makeHttpRequest(url, "PUT", requestBody);
+
         } catch (Exception e) {
-            e.printStackTrace();
+        return Optional.of(Arrays.toString(e.getStackTrace()));
         }
-        return Optional.empty();
+    }
+
+    private Optional<String> makeHttpRequest(URL url, String method, String requestBody) throws IOException {
+        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+        connection.setRequestMethod(method);
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        connection.setDoOutput(true);
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = requestBody.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+            StringBuilder response = new StringBuilder();
+            String responseLine;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+            return Optional.of(response.toString());
+        }
     }
 
     public Optional<String> logOut(String sessionId) {
