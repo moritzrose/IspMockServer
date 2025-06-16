@@ -17,6 +17,10 @@ public class UserSession {
         this.state = State.PENDING;
     }
 
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
     public String getGuid() {
         return guid;
     }

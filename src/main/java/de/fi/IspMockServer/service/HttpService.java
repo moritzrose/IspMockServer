@@ -184,9 +184,10 @@ public class HttpService {
         try {
             String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
 
-            String url =URL + AGENT_ID;
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
-
+            String url = URL + AGENT_ID;
+            ResponseDto responseDto = makeHttpRequest(url, "PUT", requestBody).get();
+            userSession.setGuid(responseDto.getHeader().get("Guid").get(0));
+            return Optional.of(responseDto.getBody());
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));
         }
