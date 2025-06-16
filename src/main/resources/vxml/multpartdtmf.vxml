@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1">
+
+	<!-- Welcome message -->
+	<form>
+		<field name="welcome">
+			<block>
+				<prompt>Willkommen bei der Sparkasse Neustadt</prompt>
+				<goto next="#username">
+			</block>
+		</field>
+	</form>
+
+	<!-- Get user's name -->
+	<form id="getName">
+		<field name="userName">
+			<prompt>Bitte nennen Sie jetzt Ihren Namen</prompt>
+		</field>
+		<block>
+			<prompt>Hallo <value expr="userName"/></prompt>
+			<goto next="#askPin"/>
+		</block>
+	</form>
+
+	<!-- Get PIN -->
+	<form id="askPin">
+		<field name="pin">
+			<grammar xmlns="http://www.w3.org/2001/06/grammar"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			mode="dtmf"
+			root="root"
+			tag-format="swi-semantics/1.0"
+			version="1.0"
+			xml:lang="de-DE"
+			xsi:schemaLocation="http://www.w3.org/2001/06/grammar http://www.w3.org/TR/speech-grammar/grammar.xsd">
+				<rule id="root">
+					<item repeat="1-5">
+						<ruleref uri="#digit"/>
+					</item>
+				</rule>
+				<rule id=\"digit\">
+					<one-of>
+						<item>0</item>
+						<item>1</item>
+						<item>2</item>
+						<item>3</item>
+						<item>4</item>
+						<item>5</item>
+						<item>6</item>
+						<item>7</item>
+						<item>8</item>
+						<item>9</item>
+					</one-of>
+				</rule>
+			</grammar>
+			<prompt>Bitte nennen Sie mir zur Authentifizierung jetzt Ihre PIN</prompt>
+			<filled>
+				<prompt>Folgendes habe ich verstanden <value expr=\"pin\"/></prompt>
+			</filled>
+		</field>
+	</form>
+</vxml>
