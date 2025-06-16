@@ -72,16 +72,16 @@
 
 
     <profiles>
-        <profile>
+        <!--<profile>
             <id>jdk17</id>
             <activation>
                 <jdk>[11,)</jdk>
             </activation>
 
             <properties>
-                <!-- das hier reicht schon aus, der untere Abschnitt ist u.U. nicht notwendig. -->
-                <maven.compiler.release>8</maven.compiler.release>
+                das hier reicht schon aus, der untere Abschnitt ist u.U. nicht notwendig.
+                <maven.compiler.release>17</maven.compiler.release>
             </properties>
-        </profile>
+        </profile> -->
     </profiles>
 </project>

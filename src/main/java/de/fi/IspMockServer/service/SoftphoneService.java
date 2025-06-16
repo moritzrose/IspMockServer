@@ -19,7 +19,7 @@ public class SoftphoneService {
 
     private final HttpService httpService;
 
-    public SoftphoneService(HttpService httpService){
+    public SoftphoneService(HttpService httpService) {
         this.httpService = httpService;
     }
 
@@ -55,7 +55,7 @@ public class SoftphoneService {
 
         // um Warten auf Event zu simulieren
         userSession.setState(State.PENDING);
-        updateButtonPanel((Map<Integer, Button>) softphones.get(userSession.getSessionId()),State.PENDING);
+        updateButtonPanel((Map<Integer, Button>) softphones.get(userSession.getSessionId()), State.PENDING);
 
         try {
             switch (Button.Function.valueOf(action)) {
@@ -81,31 +81,31 @@ public class SoftphoneService {
     }
 
     private Optional<String> unholdCall(UserSession userSession) {
-        return Optional.ofNullable(httpService.unholdCall());
+        return httpService.unholdCall();
     }
 
     private Optional<String> setAgentReady(UserSession userSession) {
-        return Optional.ofNullable(httpService.setAgentReady());
+        return httpService.setAgentReady(userSession);
     }
 
     private Optional<String> setAgentNotReady(UserSession userSession) {
-        return Optional.ofNullable(httpService.setAgentNotReady());
+        return httpService.setAgentNotReady();
     }
 
     private Optional<String> releaseCall(UserSession userSession) {
-        return Optional.ofNullable(httpService.releaseCall());
+        return httpService.releaseCall();
     }
 
     private Optional<String> initiateCall(UserSession userSession) {
-        return Optional.ofNullable(httpService.initiateCall(userSession));
+        return httpService.initiateCall(userSession);
     }
 
     private Optional<String> holdCall(UserSession userSession) {
-        return Optional.ofNullable(httpService.holdCall());
+        return httpService.holdCall();
     }
 
     private Optional<String> answerCall(UserSession userSession) {
-        return Optional.ofNullable(httpService.answerCall());
+        return httpService.answerCall();
     }
 
     private void updateButtonPanel(Map<Integer, Button> buttonPanel, State state) {
@@ -132,7 +132,7 @@ public class SoftphoneService {
                 return String.format("500: Konnte kein Ringing Event an %s senden.", sessionId);
             }
         }
-        return String.format("Event-Type nicht bekannt.");
+        return "Event-Type nicht bekannt.";
     }
 
     private void ringing(UserSession userSession) {
@@ -157,6 +157,7 @@ public class SoftphoneService {
 
         switch (eventType) {
             case "AgentState_LoggedIn":
+            case "AgentState_NotReady":
                 userSession.setState(State.NOT_READY);
                 updateButtonPanel(buttonPanel, State.NOT_READY);
                 break;
@@ -164,13 +165,6 @@ public class SoftphoneService {
                 // Todo?
                 break;
             case "AgentState_Ready":
-                userSession.setState(State.READY);
-                updateButtonPanel(buttonPanel, State.READY);
-                break;
-            case "AgentState_NotReady":
-                userSession.setState(State.NOT_READY);
-                updateButtonPanel(buttonPanel, State.NOT_READY);
-                break;
             case "AgentState_CallReleased":
                 userSession.setState(State.READY);
                 updateButtonPanel(buttonPanel, State.READY);

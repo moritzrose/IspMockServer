@@ -1,196 +1,232 @@
 package de.fi.IspMockServer.service;
 
+import de.fi.IspMockServer.entitys.ResponseDto;
 import de.fi.IspMockServer.entitys.UserSession;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
-import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.web.servlet.function.RequestPredicates.GET;
 
 @Service
 public class HttpService {
 
+
+    private static final TrustManager MOCK_TRUST_MANAGER = new X509ExtendedTrustManager() {
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
+
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
+
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) throws CertificateException {
+
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine) throws CertificateException {
+
+        }
+
+        @Override
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return new java.security.cert.X509Certificate[0];
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+        }
+
+        @Override
+        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+            // empty method
+        }
+        // ... Other void methods
+    };
     private static final String URL = "https://178.15.147.134:8043/agentgateway/resource/onlineagent/";
     private static final String AGENT_ID = System.getenv("poc.agentid");
     private static final String PASSWORD = System.getenv("poc.password");
     private static final String PHONE_NO = System.getenv("poc.tel");
+    private static final String REQUEST_BODY =
+            "{\"password\":\"%s\"," +
+                    "\"phonenum\":\"%s\"," +
+                    "\"status\":\"%s\"," +
+                    "\"releasephone\":\"%s\"," +
+                    "\"agenttype\":\"%s\"}";
 
 
-    /**
-     * <pre>
-     * "caller": "40038",
-     * "called": "40040",
-     * "skillid": 25,
-     * "callappdata": "",
-     * "mediaability": 1,
-     * "userVideoDirection": 4
-     * </pre>
-     */
-    public String initiateCall(UserSession userSession) {
+    public Optional<String> initiateCall(UserSession userSession) {
 
         final String sessionId = userSession.getSessionId();
 
-        final List<NameValuePair> entity = new ArrayList<>();
-        entity.add(new BasicNameValuePair("caller", "40038"));
-        entity.add(new BasicNameValuePair("called", "40040"));
-        entity.add(new BasicNameValuePair("skillid", "25"));
-        entity.add(new BasicNameValuePair("callappdata", ""));
-        entity.add(new BasicNameValuePair("mediaability", "1"));
-        entity.add(new BasicNameValuePair("userVideoDirection", "4"));
+        try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
 
+            String url = URL + AGENT_ID;
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-
-            final HttpPut httpPut = new HttpPut(String.format("https://IP address:Port number/agentgateway/resource/voicecall/%s/callout", sessionId));
-            httpPut.setEntity(new UrlEncodedFormEntity(entity));
-
-            try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-                return EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-            }
-        } catch (IOException e) {
-            return "\"message\": \"\",\n" +
-                    "    \t\"retcode\": \"0\",\n" +
-                    "    \t\"result\": \"1455885056-1095\"\n";
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
         }
     }
 
-    public String answerCall() {
-        return "\"message\": \"\",\n" +
-                "    \t\"retcode\": \"0\",\n" +
-                "    \t\"result\": \"1455885056-1095\"\n";
-    }
+    public Optional<String> answerCall() {
+        try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
 
-    public Optional<String> getGuid(UserSession userSession) {
-        final String sessionId = userSession.getSessionId();
+            String url = URL + AGENT_ID;
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
 
-        final List<NameValuePair> entity = new ArrayList<>();
-        entity.add(new BasicNameValuePair("password", ""));
-        entity.add(new BasicNameValuePair("phonenum", "40038"));
-        entity.add(new BasicNameValuePair("status", "4"));
-        entity.add(new BasicNameValuePair("releasephone", "true"));
-        entity.add(new BasicNameValuePair("agenttype", "4"));
-
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-
-            final HttpPut httpPut = new HttpPut(String.format("https://ip:port/agentgateway/resource/onlineagent/%s", sessionId));
-
-            httpPut.setEntity(new UrlEncodedFormEntity(entity));
-
-            try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-                return Optional.of(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
-            }
-        } catch (IOException e) {
-            return Optional.of("\"message\": \"\",\n" +
-                    "    \t\"retcode\": \"0\",\n" +
-                    "    \t\"result\": \"1455885056-1095\"\n");
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
         }
     }
 
-    public String holdCall() {
-        return "\"message\": \"\",\n" +
-                "    \t\"retcode\": \"0\",\n" +
-                "    \t\"result\": \"1455885056-1095\"\n";
+    public Optional<String> holdCall() {
+        try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+
+            String url = URL + AGENT_ID;
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
+
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
     }
 
-    public String unholdCall() {
-        return "\"message\": \"\",\n" +
-                "    \t\"retcode\": \"0\",\n" +
-                "    \t\"result\": \"1455885056-1095\"\n";
+    public Optional<String> unholdCall() {
+        try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+
+            String url = URL + AGENT_ID;
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
+
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
     }
 
-    public String releaseCall() {
-        return "\"message\": \"\",\n" +
-                "    \t\"retcode\": \"0\",\n" +
-                "    \t\"result\": \"1455885056-1095\"\n";
+    public Optional<String> releaseCall() {
+        try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+
+            String url = URL + AGENT_ID;
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
+
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
     }
 
-    public String setAgentNotReady() {
-        return "\"message\": \"\",\n" +
-                "    \t\"retcode\": \"0\",\n" +
-                "    \t\"result\": \"1455885056-1095\"\n";
+    public Optional<String> setAgentNotReady() {
+        try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+
+            String url = URL + AGENT_ID;
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
+
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
     }
 
-    public String setAgentReady() {
-        return "\"message\": \"\",\n" +
-                "    \t\"retcode\": \"0\",\n" +
-                "    \t\"result\": \"1455885056-1095\"\n";
+    public Optional<String> setAgentReady(UserSession userSession) {
+        String guid = userSession.getGuid();
+        try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+
+            String url = URL + AGENT_ID;
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
+
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
+    }
+
+    public Optional<String> maintainHeartBeat() {
+        try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+
+            String url = URL + AGENT_ID + "/handshake";
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
+
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
     }
 
     public Optional<String> login(UserSession userSession) {
-
-        final String sessionId = userSession.getSessionId();
-
-
         try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
 
-            String requestBody = String.format(
-                    "{" +
-                            "\"password\":\"%s\"," +
-                            "\"phonenum\":\"%s\"," +
-                            "\"status\":\"%s\"," +
-                            "\"releasephone\":\"%s\"," +
-                            "\"agenttype\":\"%s\"}", PASSWORD, PHONE_NO, 4, true, 4);
-
-            URL url = new URL(URL + AGENT_ID);
-            return makeHttpRequest(url, "PUT", requestBody);
+            String url =URL + AGENT_ID;
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
 
         } catch (Exception e) {
-        return Optional.of(Arrays.toString(e.getStackTrace()));
+            return Optional.of(Arrays.toString(e.getStackTrace()));
         }
     }
 
-    private Optional<String> makeHttpRequest(URL url, String method, String requestBody) throws IOException {
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-        connection.setRequestMethod(method);
-        connection.setRequestProperty("Content-Type", "application/json");
+    private Optional<ResponseDto> makeHttpRequest(String url, String method, String requestBody) throws IOException, URISyntaxException {
 
-        connection.setDoOutput(true);
-        try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = requestBody.getBytes("utf-8");
-            os.write(input, 0, input.length);
-        }
+        try {
+            SSLContext sslContext = SSLContext.getInstance("SSL"); // OR TLS
+            sslContext.init(null, new TrustManager[]{MOCK_TRUST_MANAGER}, new SecureRandom());
 
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(), "utf-8"))) {
-            StringBuilder response = new StringBuilder();
-            String responseLine;
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-            return Optional.of(response.toString());
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .header("Content-Type", "application/json")
+                    .method(method, HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
+            HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.setHeader(response.headers().map());
+            responseDto.setBody(response.body());
+            return Optional.of(responseDto);
+        } catch (URISyntaxException | InterruptedException e) {
+            return Optional.empty();
+        } catch (KeyManagementException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public Optional<String> logOut(String sessionId) {
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try {
+            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
 
-            final HttpDelete httpDelete = new HttpDelete(String.format("https://IP address:Port number/agentgateway/resource/onlineagent/%s/logout", sessionId));
+            String url = URL + AGENT_ID;
+            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
 
-            try (CloseableHttpResponse response = httpClient.execute(httpDelete)) {
-                return Optional.of(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
-            }
-        } catch (IOException e) {
-            return Optional.of("\"message\": \"\",\n" +
-                    "    \t\"retcode\": \"0\",\n" +
-                    "    \t\"result\": \"1455885056-1095\"\n");
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
         }
     }
 }
