@@ -6,6 +6,7 @@ public class UserSession {
     private String username;
     private State state;
     private String skillId;
+    private String guid;
 
     /**
      * Initial State: NOT_READY
@@ -14,6 +15,10 @@ public class UserSession {
         this.sessionId = sessionId;
         this.username = username;
         this.state = State.PENDING;
+    }
+
+    public String getGuid() {
+        return guid;
     }
 
     public String getSessionId() {

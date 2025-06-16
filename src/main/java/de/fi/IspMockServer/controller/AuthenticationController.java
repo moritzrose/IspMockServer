@@ -21,12 +21,13 @@ public class AuthenticationController {
 
     private SoftphoneService softphoneService;
     private SessionService sessionService;
-    private HttpService httpService = HttpService.getInstance();
+    private HttpService httpService;
 
     @Autowired
-    public AuthenticationController(SessionService sessionService, SoftphoneService softphoneService) {
+    public AuthenticationController(HttpService httpService, SessionService sessionService, SoftphoneService softphoneService) {
         this.softphoneService = softphoneService;
         this.sessionService = sessionService;
+        this.httpService = httpService;
     }
 
     @PostMapping("/login") //intern

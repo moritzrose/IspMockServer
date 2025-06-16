@@ -12,7 +12,12 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +27,10 @@ import java.util.Optional;
 public class HttpService {
 
     private static HttpService httpService;
+    private static final String URL = "https://178.15.147.134:8043/agentgateway/resource/onlineagent/";
+    private static final String PASSWORD = "2wsx@WSX";
+    private static final String PHONE_NO = "66660190";
 
-    private HttpService() {
-    }
-
-    public static HttpService getInstance() {
-        if (httpService == null) {
-            httpService = new HttpService();
-        }
-        return httpService;
-    }
 
     /**
      * <pre>
@@ -77,6 +76,31 @@ public class HttpService {
                 "    \t\"result\": \"1455885056-1095\"\n";
     }
 
+    public Optional<String> getGuid(UserSession userSession) {
+        final String sessionId = userSession.getSessionId();
+
+        final List<NameValuePair> entity = new ArrayList<>();
+        entity.add(new BasicNameValuePair("password", ""));
+        entity.add(new BasicNameValuePair("phonenum", "40038"));
+        entity.add(new BasicNameValuePair("status", "4"));
+        entity.add(new BasicNameValuePair("releasephone", "true"));
+        entity.add(new BasicNameValuePair("agenttype", "4"));
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+
+            final HttpPut httpPut = new HttpPut(String.format("https://ip:port/agentgateway/resource/onlineagent/%s", sessionId));
+
+            httpPut.setEntity(new UrlEncodedFormEntity(entity));
+
+            try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
+                return Optional.of(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
+            }
+        } catch (IOException e) {
+            return Optional.of("\"message\": \"\",\n" +
+                    "    \t\"retcode\": \"0\",\n" +
+                    "    \t\"result\": \"1455885056-1095\"\n");
+        }
+    }
 
     public String holdCall() {
         return "\"message\": \"\",\n" +
@@ -112,27 +136,54 @@ public class HttpService {
 
         final String sessionId = userSession.getSessionId();
 
+
+//       {
+//    "password": "2wsx@WSX",
+//    "phonenum": "66660027",
+//    "status": "4",
+//    "releasephone": "true",
+//    "autoanswer": "false",
+//    "agenttype": "4"
+//}
         final List<NameValuePair> entity = new ArrayList<>();
-        entity.add(new BasicNameValuePair("password", ""));
-        entity.add(new BasicNameValuePair("phonenum", "40038"));
+        entity.add(new BasicNameValuePair("password", PASSWORD));
+        entity.add(new BasicNameValuePair("phonenum", PHONE_NO));
         entity.add(new BasicNameValuePair("status", "4"));
         entity.add(new BasicNameValuePair("releasephone", "true"));
         entity.add(new BasicNameValuePair("agenttype", "4"));
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try {
+            URL url = new URL(URL + 43125);
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setRequestMethod("PUT");
+            connection.setRequestProperty("Content-Type", "application/json");
+            String jsonInputString = "{\n" +
+                    "    \"password\": \"2wsx@WSX\",\n" +
+                    "    \"phonenum\": \"66660190\",\n" +
+                    "    \"status\": \"4\",\n" +
+                    "    \"releasephone\": \"true\",\n" +
+                    "    \"agenttype\": \"4\"\n" +
+                    "}";
 
-            final HttpPut httpPut = new HttpPut(String.format("https://ip:port/agentgateway/resource/onlineagent/%s", sessionId));
-
-            httpPut.setEntity(new UrlEncodedFormEntity(entity));
-
-            try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-                return Optional.of(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
+            connection.setDoOutput(true);
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
             }
-        } catch (IOException e) {
-            return Optional.of("\"message\": \"\",\n" +
-                    "    \t\"retcode\": \"0\",\n" +
-                    "    \t\"result\": \"1455885056-1095\"\n");
+
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine = null;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                System.out.println(response.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return Optional.empty();
     }
 
     public Optional<String> logOut(String sessionId) {

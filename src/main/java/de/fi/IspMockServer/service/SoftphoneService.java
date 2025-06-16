@@ -17,7 +17,11 @@ import java.util.Optional;
 public class SoftphoneService {
     private final Map<String, Object> softphones = new HashMap<>();
 
-    private HttpService httpService = HttpService.getInstance();
+    private final HttpService httpService;
+
+    public SoftphoneService(HttpService httpService){
+        this.httpService = httpService;
+    }
 
     public static int[] toBinary(long bitMask, int maxBit) {
         final int[] result = new int[maxBit];
