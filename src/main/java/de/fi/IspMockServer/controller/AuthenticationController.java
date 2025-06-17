@@ -51,8 +51,8 @@ public class AuthenticationController {
         final UserSession userSession = sessionService.findUserSession(sessionId);
         sessionService.removeSession(sessionId);
         softphoneService.removeButtonPanel(sessionId);
-        SseController.emitter.get(sessionId).complete();
-        SseController.emitter.remove(sessionId);
+        //SseController.emitter.get(sessionId).complete();
+        //SseController.emitter.remove(sessionId);
         session.invalidate();
         final Optional<String> response = httpService.logOut(userSession);
         response.ifPresent(s -> model.addAttribute("httpResponse", s));

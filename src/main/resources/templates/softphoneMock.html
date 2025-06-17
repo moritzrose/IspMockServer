@@ -34,19 +34,20 @@
     </div>
     <div hx-get="/softphone" hx-trigger="sse:ringing" hx-target=".softphone"></div>
 
-    <button th:disabled="${(userSession.getState() ne userSession.getState().NOT_READY)}"
-            hx-post="/logout"
+    <button hx-post="/logout"
             hx-trigger="click"
             hx-target=".softphone"
     >Logout
     </button>
 
+    <h3>Http-Response</h3>
+    <div th:if="${httpResponse ne null}">
+        <div th:text="${httpResponse}"/>
+    </div>
+
 </div>
 
-<div th:if="${httpResponse ne null}">
-    <h3>Http-Response</h3>
-    <div th:text="${httpResponse}"/>
-</div>
+
 </body>
 
 </html>

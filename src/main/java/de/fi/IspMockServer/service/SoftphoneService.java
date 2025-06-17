@@ -86,7 +86,7 @@ public class SoftphoneService {
     }
 
     private Optional<String> setAgentNotReady(UserSession userSession) {
-        return httpService.setAgentNotReady();
+        return httpService.setAgentNotReady(userSession);
     }
 
     private Optional<String> releaseCall(UserSession userSession) {
@@ -114,24 +114,6 @@ public class SoftphoneService {
         }
     }
 
-    public String ringing(XEvent XEvent, UserSession userSession) {
-        final String sessionId = userSession.getSessionId();
-        if (XEvent.getType().equals("Ringing")) {
-
-            // hole SSE Ringing Emitter zur UserSession // TODO Rename/Refactor RingingEmitter
-            final RingingEmitter ringingEmitter = SseController.emitter.get(sessionId);
-            try {
-                ringing(userSession);
-                ringingEmitter.emit();
-                return String.format("200: Ringing Event an %s gesendet.", sessionId);
-            } catch (Exception e) {
-                ringingEmitter.completeWithError(e);
-                return String.format("500: Konnte kein Ringing Event an %s senden.", sessionId);
-            }
-        }
-        return "Event-Type nicht bekannt.";
-    }
-
     private void ringing(UserSession userSession) {
         userSession.setState(State.RINGING);
         final String sessionId = userSession.getSessionId();
@@ -156,17 +138,12 @@ public class SoftphoneService {
             System.out.println(eventType);
 
             switch (eventType) {
-                case "AgentState_LoggedIn":
-                    break;
                 case "AgentState_NotReady":
                     userSession.setState(State.NOT_READY);
                     updateButtonPanel(buttonPanel, State.NOT_READY);
                     break;
                 case "AgentEvent_Ringing":
                     ringing(userSession);
-                    break;
-                case "AgentState_LoggedOut":
-                    // Todo?
                     break;
                 case "AgentState_Ready":
                     userSession.setState(State.READY);

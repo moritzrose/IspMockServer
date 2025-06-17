@@ -99,8 +99,20 @@ public class HttpService {
 
     }
 
-    public Optional<String> setAgentNotReady() {
-        return Optional.empty();
+    public Optional<String> setAgentNotReady(UserSession userSession) {
+        try {
+            RequestDto requestDto = new RequestDto();
+
+            Map<String, String> header = new HashMap<>();
+            header.put("Content-Type", "application/json");
+            header.put("Guid", userSession.getGuid());
+
+            String url = URL + AGENT_ID + "/saybusy";
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header);
+            return responseDto.map(ResponseDto::getBody);
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
     }
 
     public Optional<String> setAgentReady(UserSession userSession) {
@@ -150,30 +162,6 @@ public class HttpService {
         }
     }
 
-    private Optional<String> polling(UserSession userSession) {
-        try {
-            RequestDto requestDto = new RequestDto();
-            //requestDto.addHeader("Content-Type", "application/json");
-            requestDto.setPassword(PASSWORD);
-            requestDto.setPhonenum(PHONE_NO);
-            requestDto.setStatus("4");
-            //requestDto.setCallBackUri();
-            //requestDto.setServiceToken(userSession.getSessionId());
-
-            String url = URL + AGENT_ID;
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, null);
-            if (responseDto.isEmpty()) {
-                return Optional.empty();
-            }
-            if (responseDto.get().getHeader().get("Guid") != null) {
-                userSession.setGuid(responseDto.get().getHeader().get("Guid").get(0));
-            }
-            return Optional.of(responseDto.get().getBody());
-        } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
-        }
-    }
-
     private Optional<ResponseDto> makeHttpRequest(String url, String method, RequestDto requestDto, Map<String, String> header) throws IOException, URISyntaxException {
 
         try {
@@ -204,13 +192,13 @@ public class HttpService {
     public Optional<String> logOut(UserSession userSession) {
         try {
             RequestDto requestDto = new RequestDto();
-            requestDto.setPassword(PASSWORD);
-            requestDto.setPhonenum(PHONE_NO);
-            //requestDto.addHeader("Guid", userSession.getGuid());
+
+            Map<String, String> header = new HashMap<>();
+            header.put("Content-Type", "application/json");
+            header.put("Guid", userSession.getGuid());
 
             String url = URL + AGENT_ID + "/logout";
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, null);
-
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "DELETE", requestDto, header);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));
