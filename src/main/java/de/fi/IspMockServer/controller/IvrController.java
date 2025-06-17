@@ -1,5 +1,7 @@
 package de.fi.IspMockServer.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/ivr")
 public class IvrController {
+    private static final Logger logger = LoggerFactory.getLogger(IvrController.class);
 
     @GetMapping("/helloworld")
     public String vxmlHelloWorld()
@@ -31,10 +34,22 @@ public class IvrController {
         return readVxml("./src/main/resources/vxml/multpartvoice.vxml");
     }
 
+    @GetMapping("/multpartvoiceext")
+    public String vxmlMultpartVoiceExt()
+    {
+        return readVxml("./src/main/resources/vxml/multpartvoice_ext.vxml");
+    }
+
     @GetMapping("/pin")
     public String vxmlPIN()
     {
         return readVxml("./src/main/resources/vxml/pin.vxml");
+    }
+
+    @GetMapping("/record")
+    public String vxmlRecord()
+    {
+        return readVxml("./src/main/resources/vxml/record.vxml");
     }
 
     private String readVxml(String path)
@@ -48,7 +63,7 @@ public class IvrController {
         }
         catch (IOException e)
         {
-            System.out.println(e);
+            logger.error(e.toString());
         }
         return result.toString();
     }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.w3.org/2001/vxml
+   http://www.w3.org/TR/voicexml20/vxml.xsd">
+   <form>
+     <property name="bargein" value="true"/>
+     <record  name="msg" beep="true" maxtime="10s"
+       finalsilence="4000ms" dtmfterm="true" type="audio/x-wav">
+       <prompt timeout="5s">
+         Nennen Sie mir Ihren Namen
+       </prompt>
+       <noinput>
+         Das habe ich nicht verstanden. Versuchen Sie es bitte erneut.
+       </noinput>
+     </record>
+     <field name="confirm">
+       <prompt>
+          Folgendes habe ich gehoert <audio expr="msg"/>.
+       </prompt>
+     </field>
+   </form>
+</vxml>

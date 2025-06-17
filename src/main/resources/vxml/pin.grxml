@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://www.w3.org/2001/06/grammar"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+mode="voice"
+root="root"
+tag-format="swi-semantics/1.0"
+version="1.0"
+xml:lang="de-DE"
+xsi:schemaLocation="http://www.w3.org/2001/06/grammar http://www.w3.org/TR/speech-grammar/grammar.xsd">
+	<rule id="root">
+		<item repeat="1-5">
+			<ruleref uri="#digit"/>
+		</item>
+	</rule>
+	<rule id=\"digit\">
+		<one-of>
+			<item>null</item>
+			<item>eins</item>
+			<item>zwei</item>
+			<item>drei</item>
+			<item>vier</item>
+			<item>fünf</item>
+			<item>sechs</item>
+			<item>sieben</item>
+			<item>acht</item>
+			<item>neun</item>
+		</one-of>
+	</rule>
+</grammar>
