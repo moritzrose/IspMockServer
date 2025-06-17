@@ -2,6 +2,7 @@ package de.fi.IspMockServer.controller;
 
 
 import de.fi.IspMockServer.entitys.EventDto;
+import de.fi.IspMockServer.entitys.EventResponseDto;
 import de.fi.IspMockServer.entitys.UserSession;
 import de.fi.IspMockServer.service.SessionService;
 import de.fi.IspMockServer.service.SoftphoneService;
@@ -62,19 +63,19 @@ public class SoftphoneController {
 
     @PostMapping("/event/{agentId}") //extern {agentId}
     @ResponseBody
-    public String event(@PathVariable String agentId, @RequestBody EventDto eventDto) {
+    public EventResponseDto event(@PathVariable String agentId, @RequestBody EventDto eventDto) {
         try {
             System.out.println(eventDto.toJson());
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
-                return String.format("AgentId: %s existiert nicht", agentId);
+                return new EventResponseDto("failure", "1");
             }
             userSession.setLastEvent(eventDto.toJson());
             softphoneService.handleEvent(userSession, eventDto);
-            return "201";
+            return new EventResponseDto("success", "0");
 
         } catch (Exception e) {
-            return "500";
+            return new EventResponseDto("failure", "1");
         }
     }
 }

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/sse")
+@RequestMapping("/sses")
 public class SseController {
 
     public static final Map<String, RingingEmitter> emitter = new HashMap<>();
