@@ -31,6 +31,12 @@ public class IvrController {
         return readVxml("./src/main/resources/vxml/multpartvoice.vxml");
     }
 
+    @GetMapping("/multpartvoiceext")
+    public String vxmlMultpartVoiceExt()
+    {
+        return readVxml("./src/main/resources/vxml/multpartvoice_ext.vxml");
+    }
+
     @GetMapping("/pin")
     public String vxmlPIN()
     {
