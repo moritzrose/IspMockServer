@@ -19,7 +19,7 @@ public class IvrController {
     @GetMapping("/helloworld")
     public String vxmlHelloWorld()
     {
-        return readVxml("./src/error/main/resources/vxml/helloworld.vxml");
+        return readVxml("./src/main/resources/vxml/helloworld.vxml");
     }
 
     @GetMapping("/multpartdtmf")
