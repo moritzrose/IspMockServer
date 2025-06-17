@@ -1,31 +1,29 @@
 package de.fi.IspMockServer.service;
 
+import de.fi.IspMockServer.entitys.RequestDto;
 import de.fi.IspMockServer.entitys.ResponseDto;
 import de.fi.IspMockServer.entitys.UserSession;
 import org.springframework.stereotype.Service;
 
 import javax.net.ssl.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-
-import static org.springframework.web.servlet.function.RequestPredicates.GET;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class HttpService {
@@ -68,144 +66,129 @@ public class HttpService {
         }
         // ... Other void methods
     };
-    private static final String URL = "https://178.15.147.134:8043/agentgateway/resource/onlineagent/";
+    private static final String URL = "https://10.0.2.79:8043/agentgateway/resource/onlineagent/";
     private static final String AGENT_ID = System.getenv("poc.agentid");
     private static final String PASSWORD = System.getenv("poc.password");
     private static final String PHONE_NO = System.getenv("poc.tel");
-    private static final String REQUEST_BODY =
-            "{\"password\":\"%s\"," +
-                    "\"phonenum\":\"%s\"," +
-                    "\"status\":\"%s\"," +
-                    "\"releasephone\":\"%s\"," +
-                    "\"agenttype\":\"%s\"}";
 
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    public static final String CALL_BACK_URI = "http://10.200.80.5:8080/softphone/event/";
 
     public Optional<String> initiateCall(UserSession userSession) {
+        return Optional.empty();
 
-        final String sessionId = userSession.getSessionId();
-
-        try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
-
-            String url = URL + AGENT_ID;
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
-
-        } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
-        }
     }
 
     public Optional<String> answerCall() {
-        try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+        return Optional.empty();
 
-            String url = URL + AGENT_ID;
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
-
-        } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
-        }
     }
 
     public Optional<String> holdCall() {
-        try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+        return Optional.empty();
 
-            String url = URL + AGENT_ID;
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
-
-        } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
-        }
     }
 
     public Optional<String> unholdCall() {
-        try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+        return Optional.empty();
 
-            String url = URL + AGENT_ID;
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
-
-        } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
-        }
     }
 
     public Optional<String> releaseCall() {
-        try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+        return Optional.empty();
 
-            String url = URL + AGENT_ID;
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
-
-        } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
-        }
     }
 
     public Optional<String> setAgentNotReady() {
-        try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
-
-            String url = URL + AGENT_ID;
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
-
-        } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
-        }
+        return Optional.empty();
     }
 
     public Optional<String> setAgentReady(UserSession userSession) {
-        String guid = userSession.getGuid();
         try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+            RequestDto requestDto = new RequestDto();
 
-            String url = URL + AGENT_ID;
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
+            Map<String, String> header = new HashMap<>();
+            header.put("Content-Type", "application/json");
+            header.put("Guid", userSession.getGuid());
 
+            String url = URL + AGENT_ID + "/sayfree";
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header);
+            return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));
         }
     }
 
     public Optional<String> maintainHeartBeat() {
-        try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
-
-            String url = URL + AGENT_ID + "/handshake";
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
-
-        } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
-        }
+        return Optional.empty();
     }
 
     public Optional<String> login(UserSession userSession) {
         try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+            RequestDto requestDto = new RequestDto();
+            requestDto.setPassword(PASSWORD);
+            requestDto.setPhonenum(PHONE_NO);
+            requestDto.setStatus("4");
+            requestDto.setCallBackUri(CALL_BACK_URI + AGENT_ID);
+            requestDto.setServiceToken(userSession.getSessionId());
+
+            Map<String, String> header = new HashMap<>();
+            header.put("Content-Type", "application/json");
 
             String url = URL + AGENT_ID;
-            ResponseDto responseDto = makeHttpRequest(url, "PUT", requestBody).get();
-            userSession.setGuid(responseDto.getHeader().get("Guid").get(0));
-            return Optional.of(responseDto.getBody());
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header);
+            if (responseDto.isEmpty()) {
+                return Optional.empty();
+            }
+            if (responseDto.get().getHeader().get("Guid") != null) {
+                userSession.setGuid(responseDto.get().getHeader().get("Guid").get(0));
+                //executor.submit(createRunnable(userSession));
+            }
+            return Optional.of(responseDto.get().getBody());
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));
         }
     }
 
-    private Optional<ResponseDto> makeHttpRequest(String url, String method, String requestBody) throws IOException, URISyntaxException {
+    private Optional<String> polling(UserSession userSession) {
+        try {
+            RequestDto requestDto = new RequestDto();
+            //requestDto.addHeader("Content-Type", "application/json");
+            requestDto.setPassword(PASSWORD);
+            requestDto.setPhonenum(PHONE_NO);
+            requestDto.setStatus("4");
+            //requestDto.setCallBackUri();
+            //requestDto.setServiceToken(userSession.getSessionId());
+
+            String url = URL + AGENT_ID;
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, null);
+            if (responseDto.isEmpty()) {
+                return Optional.empty();
+            }
+            if (responseDto.get().getHeader().get("Guid") != null) {
+                userSession.setGuid(responseDto.get().getHeader().get("Guid").get(0));
+            }
+            return Optional.of(responseDto.get().getBody());
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
+    }
+
+    private Optional<ResponseDto> makeHttpRequest(String url, String method, RequestDto requestDto, Map<String, String> header) throws IOException, URISyntaxException {
 
         try {
             SSLContext sslContext = SSLContext.getInstance("SSL"); // OR TLS
             sslContext.init(null, new TrustManager[]{MOCK_TRUST_MANAGER}, new SecureRandom());
 
-            HttpRequest request = HttpRequest.newBuilder()
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                     .uri(new URI(url))
-                    .header("Content-Type", "application/json")
-                    .method(method, HttpRequest.BodyPublishers.ofString(requestBody))
-                    .build();
+                    .method(method, HttpRequest.BodyPublishers.ofString(requestDto.toJson()));
+
+            header.forEach(requestBuilder::header);
+
+
             HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
 
             ResponseDto responseDto = new ResponseDto();
             responseDto.setHeader(response.headers().map());
@@ -218,14 +201,17 @@ public class HttpService {
         }
     }
 
-    public Optional<String> logOut(String sessionId) {
-
+    public Optional<String> logOut(UserSession userSession) {
         try {
-            String requestBody = String.format(REQUEST_BODY, PASSWORD, PHONE_NO, 4, true, 4);
+            RequestDto requestDto = new RequestDto();
+            requestDto.setPassword(PASSWORD);
+            requestDto.setPhonenum(PHONE_NO);
+            //requestDto.addHeader("Guid", userSession.getGuid());
 
-            String url = URL + AGENT_ID;
-            return Optional.of(makeHttpRequest(url, "PUT", requestBody).get().getBody());
+            String url = URL + AGENT_ID + "/logout";
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, null);
 
+            return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));
         }

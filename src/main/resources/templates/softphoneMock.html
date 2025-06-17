@@ -16,7 +16,7 @@
 
 <div th:if="${buttons ne null}"
      th:fragment="buttons"
-     th:attr="hx-sse=@{connect:/sse/ringing/{sessionId}(sessionId=${userSession.getSessionId()})}"
+     th:attr="hx-sse=@{connect:/sse/{sessionId}(sessionId=${userSession.getSessionId()})}"
      class="softphone">
 
     <div>Agent Name: <span th:text="${userSession.getUsername()}"></span></div>
@@ -30,8 +30,7 @@
                 th:disabled="${!button.value.isEnabled()}"
                 hx-post="/softphone/action"
                 hx-trigger="click"
-                hx-target=".softphone"
-        />
+                hx-target=".softphone"></button>
     </div>
     <div hx-get="/softphone" hx-trigger="sse:ringing" hx-target=".softphone"></div>
 

@@ -9,6 +9,7 @@ import de.fi.IspMockServer.entitys.UserSession;
 import de.fi.IspMockServer.entitys.XEvent;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -54,8 +55,8 @@ public class SoftphoneService {
     public Optional<String> handleAction(UserSession userSession, String action) {
 
         // um Warten auf Event zu simulieren
-        userSession.setState(State.PENDING);
-        updateButtonPanel((Map<Integer, Button>) softphones.get(userSession.getSessionId()), State.PENDING);
+        userSession.setState(State.NOT_READY);
+        updateButtonPanel((Map<Integer, Button>) softphones.get(userSession.getSessionId()), State.NOT_READY);
 
         try {
             switch (Button.Function.valueOf(action)) {
@@ -111,7 +112,7 @@ public class SoftphoneService {
     private void updateButtonPanel(Map<Integer, Button> buttonPanel, State state) {
         final int[] binaryForm = toBinary(state.getBitMask(), buttonPanel.size());
         for (int i = 0; i < binaryForm.length; i++) {
-            boolean isEnabled = binaryForm[i] == 1;
+            boolean isEnabled = true;
             // i+1, da beim 1. Bit angefangen wird, nicht beim 0.
             buttonPanel.get(i + 1).setEnabled(isEnabled);
         }
@@ -157,14 +158,19 @@ public class SoftphoneService {
 
         switch (eventType) {
             case "AgentState_LoggedIn":
+                break;
             case "AgentState_NotReady":
                 userSession.setState(State.NOT_READY);
                 updateButtonPanel(buttonPanel, State.NOT_READY);
+                break;
+            case "AgentEvent_Ringing":
+                ringing(userSession);
                 break;
             case "AgentState_LoggedOut":
                 // Todo?
                 break;
             case "AgentState_Ready":
+                break;
             case "AgentState_CallReleased":
                 userSession.setState(State.READY);
                 updateButtonPanel(buttonPanel, State.READY);

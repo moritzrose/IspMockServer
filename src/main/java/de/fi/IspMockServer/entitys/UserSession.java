@@ -7,6 +7,7 @@ public class UserSession {
     private State state;
     private String skillId;
     private String guid;
+    String lastEvent;
 
     /**
      * Initial State: NOT_READY
@@ -14,7 +15,7 @@ public class UserSession {
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
         this.username = username;
-        this.state = State.PENDING;
+        this.state = State.NOT_READY;
     }
 
     public void setGuid(String guid) {
@@ -43,5 +44,13 @@ public class UserSession {
 
     public String getSkillId() {
         return skillId;
+    }
+
+    public String getLastEvent() {
+        return lastEvent;
+    }
+
+    public void setLastEvent(String lastEvent) {
+        this.lastEvent = lastEvent;
     }
 }

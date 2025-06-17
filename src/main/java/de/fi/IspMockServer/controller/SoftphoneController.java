@@ -12,13 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -26,8 +20,8 @@ import java.util.Optional;
 @RequestMapping("/softphone")
 public class SoftphoneController {
 
-    private SoftphoneService softphoneService;
-    private SessionService sessionService;
+    private final SoftphoneService softphoneService;
+    private final SessionService sessionService;
 
     @Autowired
     public SoftphoneController(SessionService sessionService, SoftphoneService softphoneService) {
@@ -35,7 +29,7 @@ public class SoftphoneController {
         this.sessionService = sessionService;
     }
 
-    @GetMapping() // intern
+    @GetMapping // intern
     public String home(Model model, HttpServletRequest httpServletRequest) {
         final HttpSession session = httpServletRequest.getSession(false);
         if (session != null) {
@@ -44,6 +38,9 @@ public class SoftphoneController {
             if (userSession != null) {
                 model.addAttribute("buttons", softphoneService.getButtonPanel(userSession));
                 model.addAttribute("userSession", userSession);
+                //if (userSession.getLastEvent() != null) {
+                //    model.addAttribute("lastEvent", userSession.getLastEvent());
+                //}
             }
         }
         return "softphoneMock";
@@ -65,21 +62,6 @@ public class SoftphoneController {
         return "softphoneMock";
     }
 
-    @PostMapping("/ringing") //extern
-    @ResponseBody
-    public String ringing(@RequestBody XEvent XEvent) {
-        final String sessionId = XEvent.getSessionId();
-        final UserSession userSession = sessionService.findUserSession(sessionId);
-        if (userSession != null) {
-            if (userSession.getState().equals(State.READY)) {
-                return softphoneService.ringing(XEvent, userSession);
-            } else {
-                return String.format("User: %s nicht bereit.", sessionId);
-            }
-        }
-        return String.format("SessionId: %s existiert nicht.", sessionId);
-    }
-
     @PostMapping("/event/{agentId}") //extern {agentId}
     @ResponseBody
     public String event(@PathVariable String agentId, @RequestBody EventDto eventDto) {
@@ -89,6 +71,7 @@ public class SoftphoneController {
             if (userSession == null) {
                 return String.format("AgentId: %s existiert nicht", agentId);
             }
+            userSession.setLastEvent(eventDto.toJson());
             softphoneService.handleEvent(userSession, eventDto);
             return "200";
 

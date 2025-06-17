@@ -48,12 +48,13 @@ public class AuthenticationController {
     public String logout(Model model, HttpServletRequest httpServletRequest) {
         final HttpSession session = httpServletRequest.getSession(false);
         final String sessionId = (String) session.getAttribute("sessionId");
+        final UserSession userSession = sessionService.findUserSession(sessionId);
         sessionService.removeSession(sessionId);
         softphoneService.removeButtonPanel(sessionId);
         SseController.emitter.get(sessionId).complete();
         SseController.emitter.remove(sessionId);
         session.invalidate();
-        final Optional<String> response = httpService.logOut(sessionId);
+        final Optional<String> response = httpService.logOut(userSession);
         response.ifPresent(s -> model.addAttribute("httpResponse", s));
         return "softphoneMock";
     }

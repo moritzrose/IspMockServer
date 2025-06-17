@@ -5,10 +5,37 @@ public class Content {
     private String caller;
     private String called;
     private String feature;
+    private String mediaType;
     private String mediaAbility;
     private String otherPhoneWorkno;
     private String otherPhone;
     private String type;
+    private String transfer;
+    private String transform;
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public String getTransfer() {
+        return transfer;
+    }
+
+    public void setTransfer(String transfer) {
+        this.transfer = transfer;
+    }
+
+    public String getTransform() {
+        return transform;
+    }
+
+    public void setTransform(String transform) {
+        this.transform = transform;
+    }
 
     public String getCallId() {
         return callId;
