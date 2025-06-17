@@ -2,11 +2,7 @@ package de.fi.IspMockServer.service;
 
 import de.fi.IspMockServer.controller.SseController;
 import de.fi.IspMockServer.emitter.RingingEmitter;
-import de.fi.IspMockServer.entitys.Button;
-import de.fi.IspMockServer.entitys.EventDto;
-import de.fi.IspMockServer.entitys.State;
-import de.fi.IspMockServer.entitys.UserSession;
-import de.fi.IspMockServer.entitys.XEvent;
+import de.fi.IspMockServer.entitys.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -112,7 +108,7 @@ public class SoftphoneService {
     private void updateButtonPanel(Map<Integer, Button> buttonPanel, State state) {
         final int[] binaryForm = toBinary(state.getBitMask(), buttonPanel.size());
         for (int i = 0; i < binaryForm.length; i++) {
-            boolean isEnabled = true;
+            boolean isEnabled = binaryForm[i] == 1;
             // i+1, da beim 1. Bit angefangen wird, nicht beim 0.
             buttonPanel.get(i + 1).setEnabled(isEnabled);
         }
@@ -154,39 +150,45 @@ public class SoftphoneService {
 
     public void handleEvent(UserSession userSession, EventDto eventDto) {
         final Map<Integer, Button> buttonPanel = (Map<Integer, Button>) softphones.get(userSession.getSessionId());
-        final String eventType = eventDto.getEvent().getEventType();
+        for (Event event : eventDto.getEventList()) {
 
-        switch (eventType) {
-            case "AgentState_LoggedIn":
-                break;
-            case "AgentState_NotReady":
-                userSession.setState(State.NOT_READY);
-                updateButtonPanel(buttonPanel, State.NOT_READY);
-                break;
-            case "AgentEvent_Ringing":
-                ringing(userSession);
-                break;
-            case "AgentState_LoggedOut":
-                // Todo?
-                break;
-            case "AgentState_Ready":
-                break;
-            case "AgentState_CallReleased":
-                userSession.setState(State.READY);
-                updateButtonPanel(buttonPanel, State.READY);
-                break;
-            case "AgentState_UnholdCall":
-                userSession.setState(State.IN_CALL);
-                updateButtonPanel(buttonPanel, State.IN_CALL);
-                break;
-            case "AgentState_InitiateCall":
-                userSession.setState(State.CALLING);
-                updateButtonPanel(buttonPanel, State.CALLING);
-                break;
-            case "AgentState_HoldCall":
-                userSession.setState(State.HOLDING);
-                updateButtonPanel(buttonPanel, State.HOLDING);
-                break;
+            final String eventType = event.getEventType();
+            System.out.println(eventType);
+
+            switch (eventType) {
+                case "AgentState_LoggedIn":
+                    break;
+                case "AgentState_NotReady":
+                    userSession.setState(State.NOT_READY);
+                    updateButtonPanel(buttonPanel, State.NOT_READY);
+                    break;
+                case "AgentEvent_Ringing":
+                    ringing(userSession);
+                    break;
+                case "AgentState_LoggedOut":
+                    // Todo?
+                    break;
+                case "AgentState_Ready":
+                    userSession.setState(State.READY);
+                    updateButtonPanel(buttonPanel, State.READY);
+                    break;
+                case "AgentState_CallReleased":
+                    userSession.setState(State.READY);
+                    updateButtonPanel(buttonPanel, State.READY);
+                    break;
+                case "AgentState_UnholdCall":
+                    userSession.setState(State.IN_CALL);
+                    updateButtonPanel(buttonPanel, State.IN_CALL);
+                    break;
+                case "AgentState_InitiateCall":
+                    userSession.setState(State.CALLING);
+                    updateButtonPanel(buttonPanel, State.CALLING);
+                    break;
+                case "AgentState_HoldCall":
+                    userSession.setState(State.HOLDING);
+                    updateButtonPanel(buttonPanel, State.HOLDING);
+                    break;
+            }
         }
     }
 }

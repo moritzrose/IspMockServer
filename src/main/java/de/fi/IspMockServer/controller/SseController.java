@@ -17,7 +17,7 @@ public class SseController {
     public static final Map<String, RingingEmitter> emitter = new HashMap<>();
     //private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    @GetMapping("/ringing/{sessionId}")
+    @GetMapping("/{sessionId}")
     public SseEmitter ringingEmitter(@PathVariable String sessionId) {
         final RingingEmitter ringingEmitter = new RingingEmitter(0L);
 

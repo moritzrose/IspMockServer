@@ -3,10 +3,29 @@ package de.fi.IspMockServer.entitys;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.List;
+
 public class EventDto {
     private String message;
     private String retcode;
-    private Event event;
+    private List<Event> eventList;
+    private String workNo;
+
+    public List<Event> getEventList() {
+        return eventList;
+    }
+
+    public void setEventList(List<Event> eventList) {
+        this.eventList = eventList;
+    }
+
+    public String getWorkNo() {
+        return workNo;
+    }
+
+    public void setWorkNo(String workNo) {
+        this.workNo = workNo;
+    }
 
     public String getMessage() {
         return message;
@@ -22,14 +41,6 @@ public class EventDto {
 
     public void setRetcode(String retcode) {
         this.retcode = retcode;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
-        this.event = event;
     }
 
     public String toJson() throws JsonProcessingException {

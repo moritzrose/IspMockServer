@@ -2,9 +2,7 @@ package de.fi.IspMockServer.controller;
 
 
 import de.fi.IspMockServer.entitys.EventDto;
-import de.fi.IspMockServer.entitys.State;
 import de.fi.IspMockServer.entitys.UserSession;
-import de.fi.IspMockServer.entitys.XEvent;
 import de.fi.IspMockServer.service.SessionService;
 import de.fi.IspMockServer.service.SoftphoneService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,15 +63,15 @@ public class SoftphoneController {
     @PostMapping("/event/{agentId}") //extern {agentId}
     @ResponseBody
     public String event(@PathVariable String agentId, @RequestBody EventDto eventDto) {
-
         try {
+            System.out.println(eventDto.toJson());
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
                 return String.format("AgentId: %s existiert nicht", agentId);
             }
             userSession.setLastEvent(eventDto.toJson());
             softphoneService.handleEvent(userSession, eventDto);
-            return "200";
+            return "201";
 
         } catch (Exception e) {
             return "500";
