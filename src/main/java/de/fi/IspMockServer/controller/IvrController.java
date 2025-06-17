@@ -46,6 +46,12 @@ public class IvrController {
         return readVxml("./src/main/resources/vxml/pin.vxml");
     }
 
+    @GetMapping("/record")
+    public String vxmlRecord()
+    {
+        return readVxml("./src/main/resources/vxml/record.vxml");
+    }
+
     private String readVxml(String path)
     {
         StringBuilder result = new StringBuilder();
