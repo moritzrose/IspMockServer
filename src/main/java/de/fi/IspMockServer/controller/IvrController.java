@@ -64,7 +64,7 @@ public class IvrController {
         }
         catch (IOException e)
         {
-            logger.error("readVxml/1: " + e.toString());
+            logger.error("readVxml/1: " + e);
         }
         return result.toString();
     }
