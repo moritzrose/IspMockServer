@@ -1,6 +1,7 @@
 package de.fi.IspMockServer.controller;
 
 
+import de.fi.IspMockServer.entitys.huawei.Content;
 import de.fi.IspMockServer.entitys.huawei.EventDto;
 import de.fi.IspMockServer.entitys.huawei.EventResponseDto;
 import de.fi.IspMockServer.entitys.UserSession;
@@ -28,7 +29,7 @@ public class SoftphoneController {
         this.sessionService = sessionService;
     }
 
-    @GetMapping // intern
+    @GetMapping
     public String home(Model model, HttpServletRequest httpServletRequest) {
         final HttpSession session = httpServletRequest.getSession(false);
         if (session != null) {
@@ -45,7 +46,7 @@ public class SoftphoneController {
         return "softphoneMock";
     }
 
-    @PostMapping("/action") //intern
+    @PostMapping("/action")
     public String action(Model model, HttpServletRequest httpServletRequest, @RequestParam String action) {
         final HttpSession session = httpServletRequest.getSession(false);
         if (session != null) {
@@ -61,27 +62,39 @@ public class SoftphoneController {
         return "softphoneMock";
     }
 
-    @GetMapping("/metadata/{agentId}") //extern {agentId}
+    @GetMapping("/calldata/{agentId}")
     @ResponseBody
-    public String metadata(@PathVariable String agentId) {
+    public Content calldata(@PathVariable String agentId) {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
                 return null;
             }
-            Optional<String> metadata = softphoneService.fetchMetaData(userSession);
-            if (metadata.isEmpty()) {
-                return null;
-            }
-            userSession.setMetadata(metadata.get());
-            return metadata.get();
+
+            return userSession.getCallData();
 
         } catch (Exception e) {
             return null;
         }
     }
 
-    @PostMapping("/event/{agentId}") //extern {agentId}
+    @GetMapping("/callinfo/{agentId}")
+    @ResponseBody
+    public Content callinfo(@PathVariable String agentId) {
+        try {
+            final UserSession userSession = sessionService.findUserSession(agentId);
+            if (userSession == null) {
+                return null;
+            }
+            
+            return userSession.getCallInfo();
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @PostMapping("/event/{agentId}")
     @ResponseBody
     public EventResponseDto event(@PathVariable String agentId, @RequestBody EventDto eventDto) {
         try {
@@ -98,6 +111,4 @@ public class SoftphoneController {
             return new EventResponseDto("failure", "1");
         }
     }
-
-
 }

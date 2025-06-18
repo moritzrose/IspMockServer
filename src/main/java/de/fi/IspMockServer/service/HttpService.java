@@ -87,7 +87,7 @@ public class HttpService {
             header.put("Content-Type", "application/json");
             header.put("Guid", userSession.getGuid());
 
-            String url = URL + AGENT_ID + "/answer?=" + userSession.getCallId();
+            String url = URL + AGENT_ID + "/answer?=" + userSession.getCallData().getCallid();
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
@@ -225,7 +225,7 @@ public class HttpService {
             header.put("Content-Type", "application/json");
             header.put("Guid", userSession.getGuid());
 
-            String url = URL + AGENT_ID + "/appdata/?callId={" + userSession.getCallId() + "}";
+            String url = URL + AGENT_ID + "/appdata/?callId={" + userSession.getCallInfo().getCallid() + "}";
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "GET", requestDto, header);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {

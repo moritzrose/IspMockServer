@@ -46,9 +46,16 @@
     </div>
 
     <div>
-        <h3>Meta-Data</h3>
-        <button th:attr="hx-get=@{/metadata/{agentId}(agentId=${userSession.getSessionId()})}"
-        hx-target=".metadata">MetaData</button>
+        <h3>Call-Data</h3>
+        <button hx-get="/calldata/{43125}"
+        hx-target=".metadata">Fetch</button>
+        <div class="metadata"></div>
+    </div>
+
+    <div>
+        <h3>Call-Info</h3>
+        <button hx-get="/calldata/{43125}"
+                hx-target=".metadata">Fetch</button>
         <div class="metadata"></div>
     </div>
 </div>
