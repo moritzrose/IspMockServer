@@ -126,9 +126,13 @@ public class SoftphoneService {
                     userSession.setState(State.NOT_READY);
                     updateButtonPanel(buttonPanel, State.NOT_READY);
                     break;
-                case "AgentEvent_Ringing":
+                case "AgentEvent_Customer_Alerting":
                     userSession.setState(State.RINGING);
+                    userSession.setCallData(event.getContent());
                     updateButtonPanel(buttonPanel, State.RINGING);
+                    break;
+                case "AgentEvent_Incoming_CallInfo":
+                    userSession.setCallInfo(event.getContent());
                     break;
                 case "AgentState_Ready":
                     userSession.setState(State.READY);

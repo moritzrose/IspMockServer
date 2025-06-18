@@ -1,20 +1,38 @@
 package de.fi.IspMockServer.entitys;
 
+import de.fi.IspMockServer.entitys.huawei.Content;
+
 public class UserSession {
 
     private String sessionId;
     private String username;
     private State state;
-    private String skillId;
     private String guid;
-    private String callId;
     private String lastEvent;
     private String metadata;
+    private Content callData;
+    private Content callInfo;
+
+    public Content getCallInfo() {
+        return callInfo;
+    }
+
+    public void setCallInfo(Content callInfo) {
+        this.callInfo = callInfo;
+    }
 
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
         this.username = username;
         this.state = State.NOT_READY;
+    }
+
+    public Content getCallData() {
+        return callData;
+    }
+
+    public void setCallData(Content callData) {
+        this.callData = callData;
     }
 
     public String getMetadata() {
@@ -49,23 +67,11 @@ public class UserSession {
         this.state = state;
     }
 
-    public String getSkillId() {
-        return skillId;
-    }
-
     public String getLastEvent() {
         return lastEvent;
     }
 
     public void setLastEvent(String lastEvent) {
         this.lastEvent = lastEvent;
-    }
-
-    public String getCallId() {
-        return callId;
-    }
-
-    public void setCallId(String callId) {
-        this.callId = callId;
     }
 }
