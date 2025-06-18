@@ -126,7 +126,7 @@ public class SoftphoneService {
                     userSession.setState(State.NOT_READY);
                     updateButtonPanel(buttonPanel, State.NOT_READY);
                     break;
-                case "AgentEvent_Customer_Alerting":
+                case "AgentOther_PhoneAlerting":
                     userSession.setState(State.RINGING);
                     userSession.setCallData(event.getContent());
                     updateButtonPanel(buttonPanel, State.RINGING);
@@ -144,9 +144,5 @@ public class SoftphoneService {
                     break;
             }
         }
-    }
-
-    public Optional<String> fetchMetaData(UserSession userSession) {
-        return httpService.fetchMetadata(userSession);
     }
 }

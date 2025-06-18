@@ -66,7 +66,8 @@ public class HttpService {
         }
         // ... Other void methods
     };
-    private static final String URL = "https://10.0.2.79:8043/agentgateway/resource/onlineagent/";
+    private static final String AGENT_URL = "https://10.0.2.79:8043/agentgateway/resource/onlineagent/";
+    private static final String VOICE_URL = "https://10.0.2.79:8043/agentgateway/resource/voicecall/";
     private static final String AGENT_ID = System.getenv("poc.agentid");
     private static final String PASSWORD = System.getenv("poc.password");
     private static final String PHONE_NO = System.getenv("poc.tel");
@@ -87,8 +88,8 @@ public class HttpService {
             header.put("Content-Type", "application/json");
             header.put("Guid", userSession.getGuid());
 
-            String url = URL + AGENT_ID + "/answer?=" + userSession.getCallData().getCallid();
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header);
+            String url = VOICE_URL + AGENT_ID + "/answer";//?callid=" + userSession.getCallData().getCallid();
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));
@@ -118,8 +119,8 @@ public class HttpService {
             header.put("Content-Type", "application/json");
             header.put("Guid", userSession.getGuid());
 
-            String url = URL + AGENT_ID + "/saybusy";
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header);
+            String url = AGENT_URL + AGENT_ID + "/saybusy";
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));
@@ -134,8 +135,8 @@ public class HttpService {
             header.put("Content-Type", "application/json");
             header.put("Guid", userSession.getGuid());
 
-            String url = URL + AGENT_ID + "/sayfree";
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header);
+            String url = AGENT_URL + AGENT_ID + "/sayfree";
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header,userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));
@@ -158,8 +159,8 @@ public class HttpService {
             Map<String, String> header = new HashMap<>();
             header.put("Content-Type", "application/json");
 
-            String url = URL + AGENT_ID;
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header);
+            String url = AGENT_URL + AGENT_ID;
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header, userSession);
             if (responseDto.isEmpty()) {
                 return Optional.empty();
             }
@@ -172,7 +173,7 @@ public class HttpService {
         }
     }
 
-    private Optional<ResponseDto> makeHttpRequest(String url, String method, RequestDto requestDto, Map<String, String> header) throws IOException, URISyntaxException {
+    private Optional<ResponseDto> makeHttpRequest(String url, String method, RequestDto requestDto, Map<String, String> header, UserSession userSession) throws IOException, URISyntaxException {
 
         try {
             SSLContext sslContext = SSLContext.getInstance("SSL"); // OR TLS
@@ -187,12 +188,12 @@ public class HttpService {
 
             HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
             HttpResponse<String> response = client.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
-
             System.out.println("OUTGOING: " + requestDto.toJson());
 
             ResponseDto responseDto = new ResponseDto();
             responseDto.setHeader(response.headers().map());
             responseDto.setBody(response.body());
+            userSession.getResponses().push(response.body());
             return Optional.of(responseDto);
         } catch (URISyntaxException | InterruptedException e) {
             return Optional.empty();
@@ -209,24 +210,8 @@ public class HttpService {
             header.put("Content-Type", "application/json");
             header.put("Guid", userSession.getGuid());
 
-            String url = URL + AGENT_ID + "/logout";
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "DELETE", requestDto, header);
-            return responseDto.map(ResponseDto::getBody);
-        } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
-        }
-    }
-
-    public Optional<String> fetchMetadata(UserSession userSession) {
-        try {
-            RequestDto requestDto = new RequestDto();
-
-            Map<String, String> header = new HashMap<>();
-            header.put("Content-Type", "application/json");
-            header.put("Guid", userSession.getGuid());
-
-            String url = URL + AGENT_ID + "/appdata/?callId={" + userSession.getCallInfo().getCallid() + "}";
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "GET", requestDto, header);
+            String url = AGENT_URL + AGENT_ID + "/logout";
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "DELETE", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));

@@ -38,7 +38,9 @@ public class AuthenticationController {
         final UserSession userSession = sessionService.initiateSession(sessionId, username);
         softphoneService.setupButtonpanel(userSession);
         final Optional<String> response = httpService.login(userSession);
-        response.ifPresent(s -> model.addAttribute("httpResponse", s));
+        if (response.isPresent()){
+            model.addAttribute("httpResponse", response);
+        }
         model.addAttribute("buttons", softphoneService.setupButtonpanel(userSession));
         model.addAttribute("userSession", userSession);
         return "softphoneMock";

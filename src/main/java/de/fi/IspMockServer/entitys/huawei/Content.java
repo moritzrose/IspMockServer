@@ -1,5 +1,8 @@
 package de.fi.IspMockServer.entitys.huawei;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Content {
     private String callid;
     private String caller;
@@ -99,5 +102,10 @@ public class Content {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String toJson() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(this);
     }
 }

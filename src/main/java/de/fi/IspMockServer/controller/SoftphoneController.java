@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.Stack;
 
 @Controller
 @RequestMapping("/softphone")
@@ -63,15 +64,18 @@ public class SoftphoneController {
     }
 
     @GetMapping("/calldata/{agentId}")
-    @ResponseBody
-    public Content calldata(@PathVariable String agentId) {
+    public String calldata(Model model, @PathVariable String agentId) {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
                 return null;
             }
-
-            return userSession.getCallData();
+            Content callData = userSession.getCallData();
+            if (callData == null) {
+                model.addAttribute("callData", "No Call-Data");
+            }
+            model.addAttribute("callData", callData.toJson());
+            return "callData";
 
         } catch (Exception e) {
             return null;
@@ -79,15 +83,19 @@ public class SoftphoneController {
     }
 
     @GetMapping("/callinfo/{agentId}")
-    @ResponseBody
-    public Content callinfo(@PathVariable String agentId) {
+    public String callinfo(Model model, @PathVariable String agentId) {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
                 return null;
             }
-            
-            return userSession.getCallInfo();
+
+            Content callInfo = userSession.getCallData();
+            if (callInfo == null) {
+                model.addAttribute("callData", "No Call-Info");
+            }
+            model.addAttribute("callInfo", callInfo.toJson());
+            return "callInfo";
 
         } catch (Exception e) {
             return null;
@@ -109,6 +117,44 @@ public class SoftphoneController {
 
         } catch (Exception e) {
             return new EventResponseDto("failure", "1");
+        }
+    }
+
+    @GetMapping("/responses/{agentId}")
+    public String responses(Model model, @PathVariable String agentId) {
+        try {
+            final UserSession userSession = sessionService.findUserSession(agentId);
+            if (userSession == null) {
+                return null;
+            }
+
+            Stack<String> responses = userSession.getResponses();
+            if (responses.empty()) {
+                responses = new Stack<>();
+            }
+            model.addAttribute("responses", responses);
+            return "httpResponse";
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @DeleteMapping("/responses/{agentId}")
+    public String clearResponses(Model model, @PathVariable String agentId) {
+        try {
+            final UserSession userSession = sessionService.findUserSession(agentId);
+            if (userSession == null) {
+                return null;
+            }
+
+            userSession.getResponses().clear();
+
+            model.addAttribute("responses", userSession.getResponses());
+            return "callInfo";
+
+        } catch (Exception e) {
+            return null;
         }
     }
 }

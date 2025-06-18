@@ -1,6 +1,9 @@
 package de.fi.IspMockServer.entitys;
 
 import de.fi.IspMockServer.entitys.huawei.Content;
+import de.fi.IspMockServer.entitys.huawei.ResponseDto;
+
+import java.util.Stack;
 
 public class UserSession {
 
@@ -12,6 +15,15 @@ public class UserSession {
     private String metadata;
     private Content callData;
     private Content callInfo;
+    private Stack<String> responses = new Stack<>();
+
+    public Stack<String> getResponses() {
+        return responses;
+    }
+
+    public void setResponses(Stack<String> responses) {
+        this.responses = responses;
+    }
 
     public Content getCallInfo() {
         return callInfo;

@@ -19,8 +19,11 @@
      th:attr="hx-sse=@{connect:/sse/{sessionId}(sessionId=${userSession.getSessionId()})}"
      class="softphone">
 
+    <div hx-get="/softphone" hx-trigger="sse:ringing" hx-target=".softphone"></div>
+
     <div>Agent Name: <span th:text="${userSession.getUsername()}"></span></div>
     <div>Agent State: <span th:text="${userSession.getState()}"></span></div>
+
     <div th:each="button : ${buttons}"
          class="button">
         <button
@@ -32,7 +35,6 @@
                 hx-trigger="click"
                 hx-target=".softphone"></button>
     </div>
-    <div hx-get="/softphone" hx-trigger="sse:ringing" hx-target=".softphone"></div>
 
     <button hx-post="/logout"
             hx-trigger="click"
@@ -40,27 +42,36 @@
     >Logout
     </button>
 
-    <h3>Http-Response</h3>
-    <div th:if="${httpResponse ne null}">
-        <div th:text="${httpResponse}"/>
+    <div>
+        <h3>Http-Responses</h3>
+        <div hx-get="/softphone/responses/43125"
+             hx-target=".responses"
+             hx-trigger="load">
+        </div>
+        <button hx-delete="/softphone/responses/43125"
+                hx-target=".responses">Clear Responses
+        </button>
+        <div class="responses"></div>
     </div>
 
     <div>
         <h3>Call-Data</h3>
-        <button hx-get="/calldata/{43125}"
-        hx-target=".metadata">Fetch</button>
-        <div class="metadata"></div>
+        <div hx-get="/softphone/calldata/43125"
+             hx-target=".calldata"
+             hx-trigger="load">
+        </div>
+        <div class="calldata"></div>
     </div>
 
     <div>
         <h3>Call-Info</h3>
-        <button hx-get="/calldata/{43125}"
-                hx-target=".metadata">Fetch</button>
-        <div class="metadata"></div>
+        <div hx-get="/softphone/callinfo/43125"
+             hx-target=".callinfo"
+             hx-trigger="load">
+        </div>
+        <div class="callinfo"></div>
     </div>
 </div>
-
-
 </body>
 
 </html>
