@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <vxml version="2.1" xmlns="http://www.w3.org/2001/vxml" xml:lang="de-DE">
     <form id="ansage">
-        <block><prompt>I S P sagt das Pferd frisst keinen Gurkensalat</prompt>
+        <block><prompt>Die I S P sagt hallo bei der Sparkasse Musterhausen</prompt>
+            <goto next="goodbye.vxml"/>
         </block>
     </form>
 </vxml>

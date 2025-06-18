@@ -16,10 +16,28 @@ import java.util.List;
 public class IvrController {
     private static final Logger logger = LoggerFactory.getLogger(IvrController.class);
 
+    @GetMapping("/goodbye")
+    public String vxmlGoodbye()
+    {
+        return readVxml("./src/main/resources/vxml/goodbye.vxml");
+    }
+
+    @GetMapping("/greetingaudio")
+    public String vxmlGreetingAudio()
+    {
+        return readVxml("./src/main/resources/vxml/greeting_audio.vxml");
+    }
+
     @GetMapping("/helloworld")
     public String vxmlHelloWorld()
     {
         return readVxml("./src/main/resources/vxml/helloworld.vxml");
+    }
+
+    @GetMapping("/helloworld2")
+    public String vxmlHelloWorld2()
+    {
+        return readVxml("./src/main/resources/vxml/helloworld2.vxml");
     }
 
     @GetMapping("/multpartdtmf")
