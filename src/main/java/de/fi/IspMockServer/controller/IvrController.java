@@ -22,6 +22,12 @@ public class IvrController {
         return readVxml("./src/main/resources/vxml/goodbye.vxml");
     }
 
+    @GetMapping("/greetingaudio")
+    public String vxmlGreetingAudio()
+    {
+        return readVxml("./src/main/resources/vxml/greeting_audio.vxml");
+    }
+
     @GetMapping("/helloworld")
     public String vxmlHelloWorld()
     {

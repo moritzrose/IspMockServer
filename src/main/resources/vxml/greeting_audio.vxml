@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1">
+  <form>
+    <block>
+      <audio src="BEGRUESSUNG_ML_OST.vox"/>
+    </block>
+  </form>
+</vxml>
