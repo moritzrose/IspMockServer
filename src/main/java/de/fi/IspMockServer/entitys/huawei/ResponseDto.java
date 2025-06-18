@@ -1,4 +1,4 @@
-package de.fi.IspMockServer.entitys;
+package de.fi.IspMockServer.entitys.huawei;
 
 import java.util.List;
 import java.util.Map;

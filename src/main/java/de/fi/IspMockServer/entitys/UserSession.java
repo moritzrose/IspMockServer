@@ -7,12 +7,22 @@ public class UserSession {
     private State state;
     private String skillId;
     private String guid;
-    String lastEvent;
+    private String callId;
+    private String lastEvent;
+    private String metadata;
 
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
         this.username = username;
         this.state = State.NOT_READY;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 
     public void setGuid(String guid) {
@@ -49,5 +59,13 @@ public class UserSession {
 
     public void setLastEvent(String lastEvent) {
         this.lastEvent = lastEvent;
+    }
+
+    public String getCallId() {
+        return callId;
+    }
+
+    public void setCallId(String callId) {
+        this.callId = callId;
     }
 }

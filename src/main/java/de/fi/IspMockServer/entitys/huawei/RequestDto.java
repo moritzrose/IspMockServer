@@ -1,4 +1,4 @@
-package de.fi.IspMockServer.entitys;
+package de.fi.IspMockServer.entitys.huawei;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,6 +9,15 @@ public class RequestDto {
     String callBackUri;
     String serviceToken;
     String status;
+    boolean autoanswer;
+
+    public boolean getAutoanswer() {
+        return autoanswer;
+    }
+
+    public void setAutoanswer(boolean autoanswer) {
+        this.autoanswer = autoanswer;
+    }
 
     public String getPassword() {
         return password;
@@ -52,8 +61,6 @@ public class RequestDto {
 
     public String toJson() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(this);
-        System.out.println(json);
-        return json;
+        return objectMapper.writeValueAsString(this);
     }
 }

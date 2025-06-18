@@ -1,4 +1,4 @@
-package de.fi.IspMockServer.entitys;
+package de.fi.IspMockServer.entitys.huawei;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,9 +45,7 @@ public class EventDto {
 
     public String toJson() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(this);
-        System.out.println(json);
-        return json;
+        return objectMapper.writeValueAsString(this);
     }
 }
 

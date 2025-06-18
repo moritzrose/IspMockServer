@@ -1,6 +1,8 @@
 package de.fi.IspMockServer.service;
 
 import de.fi.IspMockServer.entitys.*;
+import de.fi.IspMockServer.entitys.huawei.Event;
+import de.fi.IspMockServer.entitys.huawei.EventDto;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -52,22 +54,15 @@ public class SoftphoneService {
         updateButtonPanel((Map<Integer, Button>) softphones.get(userSession.getSessionId()), State.NOT_READY);
 
         try {
-            switch (Button.Function.valueOf(action)) {
-                case ANSWER_CALL:
-                    return answerCall(userSession);
-                case HOLD_CALL:
-                    return holdCall(userSession);
-                case UNHOLD_CALL:
-                    return unholdCall(userSession);
-                case INITIATE_CALL:
-                    return initiateCall(userSession);
-                case RELEASE_CALL:
-                    return releaseCall(userSession);
-                case SET_AGENT_NOT_READY:
-                    return setAgentNotReady(userSession);
-                case SET_AGENT_READY:
-                    return setAgentReady(userSession);
-            }
+            return switch (Button.Function.valueOf(action)) {
+                case ANSWER_CALL -> answerCall(userSession);
+                case HOLD_CALL -> holdCall(userSession);
+                case UNHOLD_CALL -> unholdCall(userSession);
+                case INITIATE_CALL -> initiateCall(userSession);
+                case RELEASE_CALL -> releaseCall(userSession);
+                case SET_AGENT_NOT_READY -> setAgentNotReady(userSession);
+                case SET_AGENT_READY -> setAgentReady(userSession);
+            };
         } catch (Exception e) {
             System.out.printf("Action: %s konnte nicht verarbeitet werden: %s%n", action, e);
         }
@@ -99,7 +94,7 @@ public class SoftphoneService {
     }
 
     private Optional<String> answerCall(UserSession userSession) {
-        return httpService.answerCall();
+        return httpService.answerCall(userSession);
     }
 
     private void updateButtonPanel(Map<Integer, Button> buttonPanel, State state) {
@@ -109,13 +104,6 @@ public class SoftphoneService {
             // i+1, da beim 1. Bit angefangen wird, nicht beim 0.
             buttonPanel.get(i + 1).setEnabled(isEnabled);
         }
-    }
-
-    private void ringing(UserSession userSession) {
-        userSession.setState(State.RINGING);
-        final String sessionId = userSession.getSessionId();
-        final Map<Integer, Button> buttonPanel = (Map<Integer, Button>) softphones.get(sessionId);
-        updateButtonPanel(buttonPanel, State.RINGING);
     }
 
     public Map<Integer, Button> getButtonPanel(UserSession userSession) {
@@ -132,7 +120,6 @@ public class SoftphoneService {
         for (Event event : eventDto.getEventList()) {
 
             final String eventType = event.getEventType();
-            System.out.println(eventType);
 
             switch (eventType) {
                 case "AgentState_NotReady":
@@ -140,29 +127,22 @@ public class SoftphoneService {
                     updateButtonPanel(buttonPanel, State.NOT_READY);
                     break;
                 case "AgentEvent_Ringing":
-                    ringing(userSession);
+                    userSession.setState(State.RINGING);
+                    updateButtonPanel(buttonPanel, State.RINGING);
                     break;
                 case "AgentState_Ready":
                     userSession.setState(State.READY);
                     updateButtonPanel(buttonPanel, State.READY);
                     break;
-                case "AgentState_CallReleased":
-                    userSession.setState(State.READY);
-                    updateButtonPanel(buttonPanel, State.READY);
-                    break;
-                case "AgentState_UnholdCall":
+                case "AgentState_Busy":
                     userSession.setState(State.IN_CALL);
                     updateButtonPanel(buttonPanel, State.IN_CALL);
                     break;
-                case "AgentState_InitiateCall":
-                    userSession.setState(State.CALLING);
-                    updateButtonPanel(buttonPanel, State.CALLING);
-                    break;
-                case "AgentState_HoldCall":
-                    userSession.setState(State.HOLDING);
-                    updateButtonPanel(buttonPanel, State.HOLDING);
-                    break;
             }
         }
+    }
+
+    public Optional<String> fetchMetaData(UserSession userSession) {
+        return httpService.fetchMetadata(userSession);
     }
 }

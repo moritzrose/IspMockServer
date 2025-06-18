@@ -1,4 +1,4 @@
-package de.fi.IspMockServer.entitys;
+package de.fi.IspMockServer.entitys.huawei;
 
 public class EventResponseDto {
     String message;

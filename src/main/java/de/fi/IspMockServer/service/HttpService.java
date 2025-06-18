@@ -1,7 +1,7 @@
 package de.fi.IspMockServer.service;
 
-import de.fi.IspMockServer.entitys.RequestDto;
-import de.fi.IspMockServer.entitys.ResponseDto;
+import de.fi.IspMockServer.entitys.huawei.RequestDto;
+import de.fi.IspMockServer.entitys.huawei.ResponseDto;
 import de.fi.IspMockServer.entitys.UserSession;
 import org.springframework.stereotype.Service;
 
@@ -79,9 +79,20 @@ public class HttpService {
 
     }
 
-    public Optional<String> answerCall() {
-        return Optional.empty();
+    public Optional<String> answerCall(UserSession userSession) {
+        try {
+            RequestDto requestDto = new RequestDto();
 
+            Map<String, String> header = new HashMap<>();
+            header.put("Content-Type", "application/json");
+            header.put("Guid", userSession.getGuid());
+
+            String url = URL + AGENT_ID + "/answer?=" + userSession.getCallId();
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header);
+            return responseDto.map(ResponseDto::getBody);
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
     }
 
     public Optional<String> holdCall() {
@@ -142,8 +153,8 @@ public class HttpService {
             requestDto.setPhonenum(PHONE_NO);
             requestDto.setStatus("4");
             requestDto.setCallBackUri(CALL_BACK_URI + AGENT_ID);
+            requestDto.setAutoanswer(false);
             requestDto.setServiceToken(userSession.getSessionId());
-
             Map<String, String> header = new HashMap<>();
             header.put("Content-Type", "application/json");
 
@@ -154,7 +165,6 @@ public class HttpService {
             }
             if (responseDto.get().getHeader().get("Guid") != null) {
                 userSession.setGuid(responseDto.get().getHeader().get("Guid").get(0));
-                //executor.submit(createRunnable(userSession));
             }
             return Optional.of(responseDto.get().getBody());
         } catch (Exception e) {
@@ -178,6 +188,8 @@ public class HttpService {
             HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
             HttpResponse<String> response = client.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
 
+            System.out.println("OUTGOING: " + requestDto.toJson());
+
             ResponseDto responseDto = new ResponseDto();
             responseDto.setHeader(response.headers().map());
             responseDto.setBody(response.body());
@@ -199,6 +211,22 @@ public class HttpService {
 
             String url = URL + AGENT_ID + "/logout";
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "DELETE", requestDto, header);
+            return responseDto.map(ResponseDto::getBody);
+        } catch (Exception e) {
+            return Optional.of(Arrays.toString(e.getStackTrace()));
+        }
+    }
+
+    public Optional<String> fetchMetadata(UserSession userSession) {
+        try {
+            RequestDto requestDto = new RequestDto();
+
+            Map<String, String> header = new HashMap<>();
+            header.put("Content-Type", "application/json");
+            header.put("Guid", userSession.getGuid());
+
+            String url = URL + AGENT_ID + "/appdata/?callId={" + userSession.getCallId() + "}";
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "GET", requestDto, header);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));

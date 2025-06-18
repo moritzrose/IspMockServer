@@ -1,7 +1,7 @@
-package de.fi.IspMockServer.entitys;
+package de.fi.IspMockServer.entitys.huawei;
 
 public class Content {
-    private String callId;
+    private String callid;
     private String caller;
     private String called;
     private String feature;
@@ -37,12 +37,12 @@ public class Content {
         this.transform = transform;
     }
 
-    public String getCallId() {
-        return callId;
+    public String getCallid() {
+        return callid;
     }
 
-    public void setCallId(String callId) {
-        this.callId = callId;
+    public void setCallid(String callId) {
+        this.callid = callId;
     }
 
     public String getCaller() {

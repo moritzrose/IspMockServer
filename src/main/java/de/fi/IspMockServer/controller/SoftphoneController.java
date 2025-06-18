@@ -1,8 +1,8 @@
 package de.fi.IspMockServer.controller;
 
 
-import de.fi.IspMockServer.entitys.EventDto;
-import de.fi.IspMockServer.entitys.EventResponseDto;
+import de.fi.IspMockServer.entitys.huawei.EventDto;
+import de.fi.IspMockServer.entitys.huawei.EventResponseDto;
 import de.fi.IspMockServer.entitys.UserSession;
 import de.fi.IspMockServer.service.SessionService;
 import de.fi.IspMockServer.service.SoftphoneService;
@@ -61,11 +61,31 @@ public class SoftphoneController {
         return "softphoneMock";
     }
 
+    @GetMapping("/metadata/{agentId}") //extern {agentId}
+    @ResponseBody
+    public String metadata(@PathVariable String agentId) {
+        try {
+            final UserSession userSession = sessionService.findUserSession(agentId);
+            if (userSession == null) {
+                return null;
+            }
+            Optional<String> metadata = softphoneService.fetchMetaData(userSession);
+            if (metadata.isEmpty()) {
+                return null;
+            }
+            userSession.setMetadata(metadata.get());
+            return metadata.get();
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @PostMapping("/event/{agentId}") //extern {agentId}
     @ResponseBody
     public EventResponseDto event(@PathVariable String agentId, @RequestBody EventDto eventDto) {
         try {
-            System.out.println(eventDto.toJson());
+            System.out.println("INCOMING: " + eventDto.toJson());
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
                 return new EventResponseDto("failure", "1");
@@ -78,4 +98,6 @@ public class SoftphoneController {
             return new EventResponseDto("failure", "1");
         }
     }
+
+
 }
