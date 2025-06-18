@@ -16,6 +16,12 @@ import java.util.List;
 public class IvrController {
     private static final Logger logger = LoggerFactory.getLogger(IvrController.class);
 
+    @GetMapping("/goodbye")
+    public String vxmlGoodbye()
+    {
+        return readVxml("./src/main/resources/vxml/goodbye.vxml");
+    }
+
     @GetMapping("/helloworld")
     public String vxmlHelloWorld()
     {
