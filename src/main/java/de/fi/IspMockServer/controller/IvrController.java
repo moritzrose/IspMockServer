@@ -54,6 +54,7 @@ public class IvrController {
 
     private String readVxml(String path)
     {
+        logger.info("readVxml/0: Reading vxml from " + path);
         StringBuilder result = new StringBuilder();
         try {
             List<String> allLines = Files.readAllLines(Paths.get(path));
@@ -63,7 +64,7 @@ public class IvrController {
         }
         catch (IOException e)
         {
-            logger.error(e.toString());
+            logger.error("readVxml/1: " + e.toString());
         }
         return result.toString();
     }
