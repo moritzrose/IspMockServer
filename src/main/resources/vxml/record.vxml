@@ -2,7 +2,8 @@
 <vxml version="2.1" xmlns="http://www.w3.org/2001/vxml"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.w3.org/2001/vxml
-   http://www.w3.org/TR/voicexml20/vxml.xsd">
+   http://www.w3.org/TR/voicexml20/vxml.xsd"
+   xml:lang="de-DE">
    <form>
      <property name="bargein" value="true"/>
      <record  name="msg" beep="true" maxtime="10s"

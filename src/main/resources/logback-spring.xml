@@ -1,0 +1,34 @@
+<configuration>
+
+    <!-- Global pattern -->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" />
+
+    <!-- Appender: General application logs -->
+    <appender name="TRACE_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/trace.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Appender: Logs for VXML-related class -->
+    <appender name="VXML_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/vxml.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logger for the specific class -->
+    <logger name="de.fi.IspMockServer.controller.IvrController" level="DEBUG" additivity="false">
+        <appender-ref ref="VXML_FILE" />
+    </logger>
+
+    <!-- Root logger (all other logs) -->
+    <root level="DEBUG">
+        <appender-ref ref="TRACE_FILE" />
+    </root>
+
+</configuration>
