@@ -22,6 +22,12 @@ public class IvrController {
         return readVxml("./src/main/resources/vxml/helloworld.vxml");
     }
 
+    @GetMapping("/helloworld2")
+    public String vxmlHelloWorld2()
+    {
+        return readVxml("./src/main/resources/vxml/helloworld2.vxml");
+    }
+
     @GetMapping("/multpartdtmf")
     public String vxmlMultpartDtmf()
     {
