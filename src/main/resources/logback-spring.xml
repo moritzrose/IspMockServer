@@ -3,6 +3,13 @@
     <!-- Global pattern -->
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" />
 
+    <!-- Console appender: log everything -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
     <!-- Appender: General application logs -->
     <appender name="TRACE_FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/trace.log</file>
@@ -10,6 +17,10 @@
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
+        <!-- Filter to exclude startup logs -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
     </appender>
 
     <!-- Appender: Logs for VXML-related class -->
@@ -21,7 +32,28 @@
         </encoder>
     </appender>
 
-    <!-- Logger for the specific class -->
+    <!-- Explicitly suppress file logging for startup-related packages -->
+    <logger name="org.springframework.boot.autoconfigure" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="org.springframework.context" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="org.apache.catalina" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="org.apache.coyote" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <logger name="org.apache.tomcat" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Logger for the vxml related stuff -->
     <logger name="de.fi.IspMockServer.controller.IvrController" level="DEBUG" additivity="false">
         <appender-ref ref="VXML_FILE" />
     </logger>
