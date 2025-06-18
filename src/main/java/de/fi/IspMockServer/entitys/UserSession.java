@@ -9,9 +9,6 @@ public class UserSession {
     private String guid;
     String lastEvent;
 
-    /**
-     * Initial State: NOT_READY
-     */
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
         this.username = username;

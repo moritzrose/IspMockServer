@@ -1,11 +1,8 @@
 package de.fi.IspMockServer.service;
 
-import de.fi.IspMockServer.controller.SseController;
-import de.fi.IspMockServer.emitter.RingingEmitter;
 import de.fi.IspMockServer.entitys.*;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

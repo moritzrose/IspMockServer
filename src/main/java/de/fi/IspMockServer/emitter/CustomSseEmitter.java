@@ -4,9 +4,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 
-public class RingingEmitter extends SseEmitter {
+public class CustomSseEmitter extends SseEmitter {
 
-    public RingingEmitter(Long timeout) {
+    public CustomSseEmitter(Long timeout) {
         super(timeout);
     }
 
