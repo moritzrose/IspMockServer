@@ -73,6 +73,7 @@ public class SoftphoneController {
             Content callData = userSession.getCallData();
             if (callData == null) {
                 model.addAttribute("callData", "No Call-Data");
+                return "callData";
             }
             model.addAttribute("callData", callData.toJson());
             return "callData";
@@ -92,7 +93,8 @@ public class SoftphoneController {
 
             Content callInfo = userSession.getCallData();
             if (callInfo == null) {
-                model.addAttribute("callData", "No Call-Info");
+                model.addAttribute("callInfo", "No Call-Info");
+                return "callInfo";
             }
             model.addAttribute("callInfo", callInfo.toJson());
             return "callInfo";
