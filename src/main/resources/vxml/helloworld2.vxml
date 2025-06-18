@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <vxml version="2.1" xmlns="http://www.w3.org/2001/vxml" xml:lang="de-DE">
     <form id="ansage">
-        <block><prompt>I S P sagt das Pferd frisst keinen Gurkensalat</prompt>
-            <submit next="helloworld2.vxml"/>
+        <block><prompt>I S P wuenscht Ihnen einen schoenen Feierabend</prompt>
         </block>
     </form>
 </vxml>
