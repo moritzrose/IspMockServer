@@ -2,7 +2,6 @@
 <vxml version="2.1" xmlns="http://www.w3.org/2001/vxml" xml:lang="de-DE">
     <form id="ansage">
         <block><prompt>I S P sagt das Pferd frisst keinen Gurkensalat</prompt>
-            <submit next="helloworld2.vxml"/>
         </block>
     </form>
 </vxml>
