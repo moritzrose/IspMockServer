@@ -6,7 +6,7 @@
 		<field name="welcome">
 			<block>
 				<prompt>Willkommen bei der Sparkasse Neustadt</prompt>
-				<goto next="#username">
+				<goto next="getName">
 			</block>
 		</field>
 	</form>
