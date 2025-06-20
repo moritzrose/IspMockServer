@@ -3,51 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <script src="/htmx-1.9.12/dist/htmx.js" crossorigin="anonymous"></script>
-    <script src="/sse/sse.min.js." crossorigin="anonymous"></script>
     <title>Isp Softphone Mock</title>
 </head>
 <body>
 
-<div class="softphoneMock" th:attr="hx-sse=@{connect:/sse/{agentId}(agentId=${agentId})}">
+<button th:attr="hx-post=@{/logout/{agentId}(agentId=${agentId})}"
+        hx-trigger="click"
+        hx-target=".softphoneMock"
+>Logout
+</button>
 
-    <button hx-post="/logout"
-            hx-trigger="click"
-            hx-target=".softphoneMock"
-    >Logout
-    </button>
-
-    <h3>Agent-Status</h3>
-    <div th:attr="hx-get=@{/softphone/status/{agentId}(agentId=${agentId})}"
-         hx-target=".status"
-         hx-trigger="load">
-    </div>
-    <div class="status"></div>
-
-    <h3>Softphone</h3>
-    <div th:attr="hx-get=@{/softphone/panel/{agentId}(agentId=${agentId})}"
-         hx-target=".panel"
-         hx-trigger="load">
-    </div>
-    <div class="panel"></div>
-
-    <h3>Http-Responses</h3>
-    <div th:attr="hx-get=@{/softphone/responses/{agentId}(agentId=${agentId})}"
-         hx-target=".responses"
-         hx-trigger="load">
-    </div>
-    <button th:attr="hx-delete=@{/softphone/responses/{agentId}(agentId=${agentId})}"
-            hx-target=".responses"
-            hx-trigger="click">Clear Responses
-    </button>
-    <div class="responses"></div>
-
-    <h3>Meta-Data</h3>
-    <div th:attr="hx-get=@{/softphone/metadata/{agentId}(agentId=${agentId})}"
-         hx-target=".metadata"
-         hx-trigger="load">
-    </div>
-    <div class="metadata"></div>
+<h3>Agent-Status</h3>
+<div th:attr="hx-get=@{/softphone/status/{agentId}(agentId=${agentId})}"
+     hx-target=".status"
+     hx-trigger="load">
 </div>
+<div class="status"></div>
+
+<h3>Softphone</h3>
+<div th:attr="hx-get=@{/softphone/panel/{agentId}(agentId=${agentId})}"
+     hx-target=".panel"
+     hx-trigger="load">
+</div>
+<div class="panel"></div>
+
+<h3>Http-Responses</h3>
+<div th:attr="hx-get=@{/softphone/responses/{agentId}(agentId=${agentId})}"
+     hx-target=".responses"
+     hx-trigger="load">
+</div>
+<button th:attr="hx-delete=@{/softphone/responses/{agentId}(agentId=${agentId})}"
+        hx-target=".responses"
+        hx-trigger="click">Clear Responses
+</button>
+<div class="responses"></div>
+
+<h3>Meta-Data</h3>
+<div th:attr="hx-get=@{/softphone/metadata/{agentId}(agentId=${agentId})}"
+     hx-target=".metadata"
+     hx-trigger="load">
+</div>
+<div class="metadata"></div>
 </body>
 
 </html>
