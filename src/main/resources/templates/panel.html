@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div class="panel">
+    <div th:each="button : ${buttons}"
+         class="button">
+        <button
+                th:name="command"
+                th:value="${button.value.getCommand()}"
+                th:text="${button.value.getLabel()}"
+                th:disabled="${!button.value.isEnabled()}"
+                th:attr="hx-post=@{/softphone/command/{agentId}(agentId=${agentId})}"
+                hx-trigger="click"
+                hx-target=".panel"></button>
+    </div>
+</div>
+</body>
+</html>

@@ -39,22 +39,22 @@ public class SoftphoneService {
     public Map<Integer, Button> setupButtonpanel(UserSession userSession) {
         // erzeuge neues Buttonpanel für neuen User
         final Map<Integer, Button> buttonPanel = new HashMap<>();
-        for (Button.Function function : Button.Function.values()) {
-            buttonPanel.put(function.getBit(), new Button(function.name(), function.getLabel()));
+        for (Button.Command command : Button.Command.values()) {
+            buttonPanel.put(command.getBit(), new Button(command.name(), command.getLabel()));
         }
         final String agentId = userSession.getSessionId();
         softphones.put(agentId, buttonPanel);
         return buttonPanel;
     }
 
-    public Optional<String> handleAction(UserSession userSession, String action) {
+    public Optional<String> executeCommand(UserSession userSession, String command) {
 
         // um Warten auf Event zu simulieren
         userSession.setState(State.NOT_READY);
         updateButtonPanel((Map<Integer, Button>) softphones.get(userSession.getSessionId()), State.NOT_READY);
 
         try {
-            return switch (Button.Function.valueOf(action)) {
+            return switch (Button.Command.valueOf(command)) {
                 case ANSWER_CALL -> answerCall(userSession);
                 case HOLD_CALL -> holdCall(userSession);
                 case UNHOLD_CALL -> unholdCall(userSession);
@@ -64,7 +64,7 @@ public class SoftphoneService {
                 case SET_AGENT_READY -> setAgentReady(userSession);
             };
         } catch (Exception e) {
-            System.out.printf("Action: %s konnte nicht verarbeitet werden: %s%n", action, e);
+            System.out.printf("Command: %s konnte nicht verarbeitet werden: %s%n", command, e);
         }
         return Optional.empty();
     }

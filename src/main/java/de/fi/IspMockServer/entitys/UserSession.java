@@ -1,7 +1,6 @@
 package de.fi.IspMockServer.entitys;
 
 import de.fi.IspMockServer.entitys.huawei.Content;
-import de.fi.IspMockServer.entitys.huawei.ResponseDto;
 
 import java.util.Stack;
 
@@ -33,13 +32,13 @@ public class UserSession {
         this.callInfo = callInfo;
     }
 
-    public UserSession(String sessionId, String username) {
-        this.sessionId = sessionId;
-        this.username = username;
-        this.state = State.NOT_READY;
+    public UserSession(String agentId) {
+        this.sessionId = agentId;
+        this.username = agentId;
+        this.state = State.PENDING;
     }
 
-    public Content getCallData() {
+    public Content getMetaData() {
         return callData;
     }
 

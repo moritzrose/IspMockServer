@@ -1,14 +1,12 @@
 package de.fi.IspMockServer.entitys;
 
-import de.fi.IspMockServer.service.HttpService;
-
 public class Button {
 
-    private final String name;
     private final String label;
+    private final String command;
     private boolean enabled;
 
-    public enum Function {
+    public enum Command {
 
         INITIATE_CALL("Anrufen", 1), // 4
         ANSWER_CALL("Annehmen", 2), // 3,4
@@ -21,7 +19,7 @@ public class Button {
         private final int bit;
         private final String label;
 
-        Function(String label, int bit) {
+        Command(String label, int bit) {
             this.label = label;
             this.bit = bit;
         }
@@ -35,14 +33,14 @@ public class Button {
         }
     }
 
-    public Button(String name, String label) {
-        this.name = name;
+    public Button(String command, String label) {
+        this.command = command;
         this.label = label;
         this.enabled = false;
     }
 
-    public String getName() {
-        return name;
+    public String getCommand() {
+        return command;
     }
 
     public String getLabel() {

@@ -1,11 +1,14 @@
 package de.fi.IspMockServer.service;
 
+import de.fi.IspMockServer.entitys.UserSession;
 import de.fi.IspMockServer.entitys.huawei.RequestDto;
 import de.fi.IspMockServer.entitys.huawei.ResponseDto;
-import de.fi.IspMockServer.entitys.UserSession;
 import org.springframework.stereotype.Service;
 
-import javax.net.ssl.*;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
@@ -18,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +33,7 @@ import java.util.concurrent.Executors;
 public class HttpService {
 
 
+    public static final String CALL_BACK_URI = "http://10.200.80.5:8080/softphone/event/";
     private static final TrustManager MOCK_TRUST_MANAGER = new X509ExtendedTrustManager() {
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
@@ -71,9 +76,7 @@ public class HttpService {
     private static final String AGENT_ID = System.getenv("poc.agentid");
     private static final String PASSWORD = System.getenv("poc.password");
     private static final String PHONE_NO = System.getenv("poc.tel");
-
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    public static final String CALL_BACK_URI = "http://10.200.80.5:8080/softphone/event/";
 
     public Optional<String> initiateCall(UserSession userSession) {
         return Optional.empty();
@@ -88,7 +91,7 @@ public class HttpService {
             header.put("Content-Type", "application/json");
             header.put("Guid", userSession.getGuid());
 
-            String url = VOICE_URL + AGENT_ID + "/answer";//?callid=" + userSession.getCallData().getCallid();
+            String url = VOICE_URL + AGENT_ID + "/answer";
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
@@ -136,7 +139,7 @@ public class HttpService {
             header.put("Guid", userSession.getGuid());
 
             String url = AGENT_URL + AGENT_ID + "/sayfree";
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header,userSession);
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
             return Optional.of(Arrays.toString(e.getStackTrace()));
@@ -181,7 +184,9 @@ public class HttpService {
 
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                     .uri(new URI(url))
+                    .timeout(Duration.parse("PT5S"))
                     .method(method, HttpRequest.BodyPublishers.ofString(requestDto.toJson()));
+
 
             header.forEach(requestBuilder::header);
 
@@ -195,10 +200,10 @@ public class HttpService {
             responseDto.setBody(response.body());
             userSession.getResponses().push(response.body());
             return Optional.of(responseDto);
-        } catch (URISyntaxException | InterruptedException e) {
-            return Optional.empty();
-        } catch (KeyManagementException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+        } catch (URISyntaxException | InterruptedException | KeyManagementException | NoSuchAlgorithmException e) {
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.setError(e.getMessage());
+            return Optional.of(responseDto);
         }
     }
 

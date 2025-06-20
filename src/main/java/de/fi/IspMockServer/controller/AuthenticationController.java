@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,34 +31,44 @@ public class AuthenticationController {
         this.httpService = httpService;
     }
 
-    @PostMapping("/login") //intern
-    public String login(Model model, HttpServletRequest httpServletRequest, @RequestParam String username) {
-        final HttpSession session = httpServletRequest.getSession(true);
-        final String sessionId = username;
-        session.setAttribute("sessionId", sessionId);
-        final UserSession userSession = sessionService.initiateSession(sessionId, username);
-        softphoneService.setupButtonpanel(userSession);
-        final Optional<String> response = httpService.login(userSession);
-        if (response.isPresent()){
-            model.addAttribute("httpResponse", response);
+    @PostMapping("/login")
+    public String login(Model model, HttpServletRequest httpServletRequest, @RequestParam String agentId) {
+        try {
+            final HttpSession session = httpServletRequest.getSession(true);
+            session.setAttribute("agentId", agentId);
+            final UserSession userSession = sessionService.initiateSession(agentId);
+            softphoneService.setupButtonpanel(userSession);
+            Optional<String> response = httpService.login(userSession);
+            if (response.isEmpty()) {
+                return "error";
+            }
+            model.addAttribute("agentId", agentId);
+            return "home";
+        } catch (Exception e) {
+            return "error";
         }
-        model.addAttribute("buttons", softphoneService.setupButtonpanel(userSession));
-        model.addAttribute("userSession", userSession);
-        return "softphoneMock";
     }
 
-    @PostMapping("/logout") //intern
-    public String logout(Model model, HttpServletRequest httpServletRequest) {
-        final HttpSession session = httpServletRequest.getSession(false);
-        final String sessionId = (String) session.getAttribute("sessionId");
-        final UserSession userSession = sessionService.findUserSession(sessionId);
-        sessionService.removeSession(sessionId);
-        softphoneService.removeButtonPanel(sessionId);
-        //SseController.emitter.get(sessionId).complete();
-        //SseController.emitter.remove(sessionId);
-        session.invalidate();
-        final Optional<String> response = httpService.logOut(userSession);
-        response.ifPresent(s -> model.addAttribute("httpResponse", s));
-        return "softphoneMock";
+    @PostMapping("/logout/{agentId}")
+    public String logout(HttpServletRequest httpServletRequest, @PathVariable String agentId) {
+        try {
+            final HttpSession session = httpServletRequest.getSession(false);
+            final UserSession userSession = sessionService.findUserSession(agentId);
+            if (userSession == null) {
+                return "error";
+            }
+            Optional<String> response = httpService.logOut(userSession);
+            if (response.isEmpty()) {
+                return "error";
+            }
+            sessionService.removeSession(agentId);
+            softphoneService.removeButtonPanel(agentId);
+            session.invalidate();
+            return "login";
+            //SseController.emitter.get(sessionId).complete();
+            //SseController.emitter.remove(sessionId);
+        } catch (Exception e) {
+            return "error";
+        }
     }
 }

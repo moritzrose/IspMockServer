@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/htmx-1.9.12/dist/htmx.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="login">
+    <form hx-post="/login" hx-target=".login" hx-trigger="submit">
+        <input type="text" name="agentId" value="43125" required>
+        <button type="submit">Login</button>
+    </form>
+</div>
+</body>
+</html>

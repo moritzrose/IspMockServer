@@ -7,6 +7,17 @@ public class ResponseDto {
     Map<String, List<String>> header;
     String body;
 
+    String error;
+
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
     public Map<String, List<String>> getHeader() {
         return header;
     }
