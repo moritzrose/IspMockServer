@@ -1,8 +1,8 @@
 package de.fi.IspMockServer.service;
 
 import de.fi.IspMockServer.entitys.UserSession;
-import de.fi.IspMockServer.entitys.huawei.RequestDto;
-import de.fi.IspMockServer.entitys.huawei.ResponseDto;
+import de.fi.IspMockServer.entitys.vier.RequestDto;
+import de.fi.IspMockServer.entitys.vier.ResponseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -75,8 +75,6 @@ public class HttpService {
         }
         // ... Other void methods
     };
-    private static final String AGENT_URL = "https://10.0.2.79:8043/agentgateway/resource/onlineagent/";
-    private static final String VOICE_URL = "https://10.0.2.79:8043/agentgateway/resource/voicecall/";
     private static final String AGENT_ID = System.getenv("poc.agentid");
     private static final String PASSWORD = System.getenv("poc.password");
     private static final String PHONE_NO = System.getenv("poc.tel");
@@ -93,9 +91,8 @@ public class HttpService {
 
             Map<String, String> header = new HashMap<>();
             header.put("Content-Type", "application/json");
-            header.put("Guid", userSession.getGuid());
 
-            String url = VOICE_URL + AGENT_ID + "/answer";
+            String url = ""; //TODO
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
@@ -125,9 +122,8 @@ public class HttpService {
 
             Map<String, String> header = new HashMap<>();
             header.put("Content-Type", "application/json");
-            header.put("Guid", userSession.getGuid());
 
-            String url = AGENT_URL + AGENT_ID + "/saybusy";
+            String url = ""; //TODO
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
@@ -142,9 +138,8 @@ public class HttpService {
 
             Map<String, String> header = new HashMap<>();
             header.put("Content-Type", "application/json");
-            header.put("Guid", userSession.getGuid());
 
-            String url = AGENT_URL + AGENT_ID + "/sayfree";
+            String url = ""; //TODO
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
@@ -156,26 +151,33 @@ public class HttpService {
     public Optional<String> login(UserSession userSession) {
         try {
             RequestDto requestDto = new RequestDto();
-            requestDto.setPassword(PASSWORD);
-            requestDto.setPhonenum(PHONE_NO);
-            requestDto.setStatus("4");
-            requestDto.setCallBackUri(CALL_BACK_URI + AGENT_ID);
-            requestDto.setAutoanswer(false);
-            requestDto.setServiceToken(userSession.getSessionId());
+
             Map<String, String> header = new HashMap<>();
             header.put("Content-Type", "application/json");
 
-            String url = AGENT_URL + AGENT_ID;
+            String url = ""; //TODO
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header, userSession);
-            if (responseDto.isEmpty()) {
-                return Optional.empty();
-            }
-            if (responseDto.get().getHeader().get("Guid") != null) {
-                userSession.setGuid(responseDto.get().getHeader().get("Guid").get(0));
-            }
-            return Optional.of(responseDto.get().getBody());
+            return responseDto.map(ResponseDto::getBody);
+
         } catch (Exception e) {
             LOGGER.error("login: ", e);
+            return Optional.empty();
+        }
+    }
+
+
+    public Optional<String> logOut(UserSession userSession) {
+        try {
+            RequestDto requestDto = new RequestDto();
+
+            Map<String, String> header = new HashMap<>();
+            header.put("Content-Type", "application/json");
+
+            String url = ""; //TODO
+            Optional<ResponseDto> responseDto = makeHttpRequest(url, "DELETE", requestDto, header, userSession);
+            return responseDto.map(ResponseDto::getBody);
+        } catch (Exception e) {
+            LOGGER.error("logOut: ", e);
             return Optional.empty();
         }
     }
@@ -191,9 +193,7 @@ public class HttpService {
                     .timeout(Duration.parse("PT5S"))
                     .method(method, HttpRequest.BodyPublishers.ofString(requestDto.toJson()));
 
-
             header.forEach(requestBuilder::header);
-
 
             HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
             HttpResponse<String> response = client.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
@@ -207,23 +207,6 @@ public class HttpService {
         } catch (URISyntaxException | InterruptedException | KeyManagementException | NoSuchAlgorithmException |
                  HttpConnectTimeoutException e) {
             LOGGER.error("makeHttpRequest: ", e);
-            return Optional.empty();
-        }
-    }
-
-    public Optional<String> logOut(UserSession userSession) {
-        try {
-            RequestDto requestDto = new RequestDto();
-
-            Map<String, String> header = new HashMap<>();
-            header.put("Content-Type", "application/json");
-            header.put("Guid", userSession.getGuid());
-
-            String url = AGENT_URL + AGENT_ID + "/logout";
-            Optional<ResponseDto> responseDto = makeHttpRequest(url, "DELETE", requestDto, header, userSession);
-            return responseDto.map(ResponseDto::getBody);
-        } catch (Exception e) {
-            LOGGER.error("logOut: ", e);
             return Optional.empty();
         }
     }
