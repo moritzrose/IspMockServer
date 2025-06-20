@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <script src="/htmx-1.9.12/dist/htmx.js" crossorigin="anonymous"></script>
+    <script src="/sse/sse.min.js." crossorigin="anonymous"></script>
     <title>Isp Softphone Mock</title>
 </head>
 <body>
 
-<button th:attr="hx-post=@{/logout/{agentId}(agentId=${agentId})}"
-        hx-trigger="click"
-        hx-target=".softphoneMock"
->Logout
-</button>
+<div class="softphoneMock" th:attr="hx-sse=@{connect:/sse/{agentId}(agentId=${agentId})}">
+
+    <button th:attr="hx-post=@{/logout/{agentId}(agentId=${agentId})}"
+            hx-trigger="click"
+            hx-target=".softphoneMock"
+    >Logout
+    </button>
 
 <h3>Agent-Status</h3>
 <div th:attr="hx-get=@{/softphone/status/{agentId}(agentId=${agentId})}"
