@@ -1,8 +1,11 @@
 package de.fi.IspMockServer.service;
 
+import de.fi.IspMockServer.controller.SoftphoneController;
 import de.fi.IspMockServer.entitys.*;
 import de.fi.IspMockServer.entitys.huawei.Event;
 import de.fi.IspMockServer.entitys.huawei.EventDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -11,6 +14,9 @@ import java.util.Optional;
 
 @Service
 public class SoftphoneService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SoftphoneService.class);
+
     private final Map<String, Object> softphones = new HashMap<>();
 
     private final HttpService httpService;
@@ -50,8 +56,8 @@ public class SoftphoneService {
     public Optional<String> executeCommand(UserSession userSession, String command) {
 
         // um Warten auf Event zu simulieren
-        userSession.setState(State.NOT_READY);
-        updateButtonPanel((Map<Integer, Button>) softphones.get(userSession.getSessionId()), State.NOT_READY);
+        userSession.setState(State.PENDING);
+        updateButtonPanel((Map<Integer, Button>) softphones.get(userSession.getSessionId()), State.PENDING);
 
         try {
             return switch (Button.Command.valueOf(command)) {
@@ -64,7 +70,7 @@ public class SoftphoneService {
                 case SET_AGENT_READY -> setAgentReady(userSession);
             };
         } catch (Exception e) {
-            System.out.printf("Command: %s konnte nicht verarbeitet werden: %s%n", command, e);
+            LOGGER.error("executeCommand: ", e);
         }
         return Optional.empty();
     }

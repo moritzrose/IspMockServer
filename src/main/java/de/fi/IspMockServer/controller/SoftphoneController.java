@@ -9,6 +9,8 @@ import de.fi.IspMockServer.service.SessionService;
 import de.fi.IspMockServer.service.SoftphoneService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +29,8 @@ import java.util.Stack;
 @RequestMapping("/softphone")
 public class SoftphoneController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SoftphoneController.class);
+
     private final SoftphoneService softphoneService;
     private final SessionService sessionService;
 
@@ -42,9 +46,11 @@ public class SoftphoneController {
         if (session != null) {
             final String agentId = (String) session.getAttribute("agentId");
             final UserSession userSession = sessionService.findUserSession(agentId);
-            if (userSession != null) {
-                model.addAttribute("agentId", agentId);
+            if (userSession == null) {
+                LOGGER.error("event: userSession is null");
+                return "error";
             }
+            model.addAttribute("agentId", agentId);
             return "home";
         }
         return "login";
@@ -56,11 +62,12 @@ public class SoftphoneController {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
-                return 500;
+                LOGGER.error("event: userSession is null");
+                return;
             }
             softphoneService.executeCommand(userSession, command);
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.error("command: ", e);
         }
     }
 
@@ -71,6 +78,7 @@ public class SoftphoneController {
             System.out.println("INCOMING: " + eventDto.toJson());
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
+                LOGGER.error("event: userSession is null");
                 return new EventResponseDto("failure", "1");
             }
             userSession.setLastEvent(eventDto.toJson());
@@ -78,7 +86,7 @@ public class SoftphoneController {
             return new EventResponseDto("success", "0");
 
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.error("event: ", e);
             return new EventResponseDto("failure", "1");
         }
     }
@@ -88,12 +96,14 @@ public class SoftphoneController {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
+                LOGGER.error("panel: userSession is null");
                 return "error";
             }
             model.addAttribute("buttons", softphoneService.getButtonPanel(userSession));
             model.addAttribute("agentId", agentId);
             return "panel";
         } catch (Exception e) {
+            LOGGER.error("panel: ", e);
             return "error";
         }
     }
@@ -104,12 +114,14 @@ public class SoftphoneController {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
+                LOGGER.error("status: userSession is null");
                 return "error";
             }
             model.addAttribute("username", userSession.getUsername());
             model.addAttribute("state", userSession.getState());
             return "status";
         } catch (Exception e) {
+            LOGGER.error("status: ", e);
             return "error";
         }
     }
@@ -119,6 +131,7 @@ public class SoftphoneController {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
+                LOGGER.error("metadata: userSession is null");
                 return "error";
             }
             Content metaData = userSession.getMetaData();
@@ -130,6 +143,7 @@ public class SoftphoneController {
             return "metadata";
 
         } catch (Exception e) {
+            LOGGER.error("metadata: ", e);
             return "error";
         }
     }
@@ -140,6 +154,7 @@ public class SoftphoneController {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
+                LOGGER.error("responses: userSession is null");
                 return "error";
             }
 
@@ -152,6 +167,7 @@ public class SoftphoneController {
             return "httpResponse";
 
         } catch (Exception e) {
+            LOGGER.error("responses: ", e);
             return "error";
         }
     }
@@ -161,6 +177,7 @@ public class SoftphoneController {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
+                LOGGER.error("clearResponses: userSession is null");
                 return "error";
             }
             userSession.getResponses().clear();
@@ -170,6 +187,7 @@ public class SoftphoneController {
             return "httpResponse";
 
         } catch (Exception e) {
+            LOGGER.error("clearResponses: ", e);
             return "error";
         }
     }

@@ -3,6 +3,8 @@ package de.fi.IspMockServer.service;
 import de.fi.IspMockServer.entitys.UserSession;
 import de.fi.IspMockServer.entitys.huawei.RequestDto;
 import de.fi.IspMockServer.entitys.huawei.ResponseDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLContext;
@@ -14,6 +16,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
+import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.KeyManagementException;
@@ -22,7 +25,6 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +36,8 @@ public class HttpService {
 
 
     public static final String CALL_BACK_URI = "http://10.200.80.5:8080/softphone/event/";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpService.class);
     private static final TrustManager MOCK_TRUST_MANAGER = new X509ExtendedTrustManager() {
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) throws CertificateException {
@@ -95,7 +99,8 @@ public class HttpService {
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "PUT", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
+            LOGGER.error("answerCall: ", e);
+            return Optional.empty();
         }
     }
 
@@ -126,7 +131,8 @@ public class HttpService {
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
+            LOGGER.error("setAgentNotReady: ", e);
+            return Optional.empty();
         }
     }
 
@@ -142,12 +148,9 @@ public class HttpService {
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "POST", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
+            LOGGER.error("setAgentReady: ", e);
+            return Optional.empty();
         }
-    }
-
-    public Optional<String> maintainHeartBeat() {
-        return Optional.empty();
     }
 
     public Optional<String> login(UserSession userSession) {
@@ -172,7 +175,8 @@ public class HttpService {
             }
             return Optional.of(responseDto.get().getBody());
         } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
+            LOGGER.error("login: ", e);
+            return Optional.empty();
         }
     }
 
@@ -200,10 +204,10 @@ public class HttpService {
             responseDto.setBody(response.body());
             userSession.getResponses().push(response.body());
             return Optional.of(responseDto);
-        } catch (URISyntaxException | InterruptedException | KeyManagementException | NoSuchAlgorithmException e) {
-            ResponseDto responseDto = new ResponseDto();
-            responseDto.setError(e.getMessage());
-            return Optional.of(responseDto);
+        } catch (URISyntaxException | InterruptedException | KeyManagementException | NoSuchAlgorithmException |
+                 HttpConnectTimeoutException e) {
+            LOGGER.error("makeHttpRequest: ", e);
+            return Optional.empty();
         }
     }
 
@@ -219,7 +223,8 @@ public class HttpService {
             Optional<ResponseDto> responseDto = makeHttpRequest(url, "DELETE", requestDto, header, userSession);
             return responseDto.map(ResponseDto::getBody);
         } catch (Exception e) {
-            return Optional.of(Arrays.toString(e.getStackTrace()));
+            LOGGER.error("logOut: ", e);
+            return Optional.empty();
         }
     }
 }

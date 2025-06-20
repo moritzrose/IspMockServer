@@ -6,6 +6,8 @@ import de.fi.IspMockServer.service.SessionService;
 import de.fi.IspMockServer.service.SoftphoneService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +21,8 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/")
 public class AuthenticationController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationController.class);
 
     private SoftphoneService softphoneService;
     private SessionService sessionService;
@@ -45,6 +49,7 @@ public class AuthenticationController {
             model.addAttribute("agentId", agentId);
             return "home";
         } catch (Exception e) {
+            LOGGER.error("login: ", e);
             return "error";
         }
     }
@@ -55,6 +60,7 @@ public class AuthenticationController {
             final HttpSession session = httpServletRequest.getSession(false);
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
+                LOGGER.error("logout: userSession is null");
                 return "error";
             }
             Optional<String> response = httpService.logOut(userSession);
@@ -68,6 +74,7 @@ public class AuthenticationController {
             //SseController.emitter.get(sessionId).complete();
             //SseController.emitter.remove(sessionId);
         } catch (Exception e) {
+            LOGGER.error("logout: ", e);
             return "error";
         }
     }
