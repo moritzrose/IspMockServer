@@ -11,7 +11,6 @@ public class CustomSseEmitter extends SseEmitter {
     }
 
     public void emit(String event, String data) throws IOException {
-        //data leer aber notwendig, da sonst hx-trigger: sse:ringing nicht funktioniert
         send(SseEmitter.event().name(event).data(data));
     }
 }
