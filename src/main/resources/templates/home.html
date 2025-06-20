@@ -10,7 +10,7 @@
 
 <div class="softphoneMock" th:attr="hx-sse=@{connect:/sse/{agentId}(agentId=${agentId})}">
 
-    <button hx-post="/logout"
+    <button th:attr="hx-post=@{/logout/{agentId}(agentId=${agentId})}"
             hx-trigger="click"
             hx-target=".softphoneMock"
     >Logout

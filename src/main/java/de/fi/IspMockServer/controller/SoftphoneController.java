@@ -52,7 +52,7 @@ public class SoftphoneController {
 
     @PostMapping("/command/{agentId}")
     @ResponseBody
-    public int command(@PathVariable String agentId, @RequestParam String command) {
+    public void command(@PathVariable String agentId, @RequestParam String command) {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
@@ -60,9 +60,8 @@ public class SoftphoneController {
             }
             softphoneService.executeCommand(userSession, command);
         } catch (Exception e) {
-            return 500;
+            System.out.println(e);
         }
-        return 500;
     }
 
     @PostMapping("/event/{agentId}")
@@ -79,6 +78,7 @@ public class SoftphoneController {
             return new EventResponseDto("success", "0");
 
         } catch (Exception e) {
+            System.out.println(e);
             return new EventResponseDto("failure", "1");
         }
     }

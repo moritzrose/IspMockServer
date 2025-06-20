@@ -15,28 +15,27 @@ import java.util.Map;
 public class SseController {
 
     public static final Map<String, CustomSseEmitter> emitters = new HashMap<>();
-    //private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    @GetMapping("/{sessionId}")
-    public SseEmitter connect(@PathVariable String sessionId) {
+    @GetMapping("/{agentId}")
+    public SseEmitter connect(@PathVariable String agentId) {
         final CustomSseEmitter emitter = new CustomSseEmitter(0L);
 
         emitter.onCompletion(() -> {
             emitter.complete();
-            emitters.remove(sessionId);
+            emitters.remove(agentId);
         });
 
         emitter.onTimeout(() -> {
             emitter.complete();
-            emitters.remove(sessionId);
+            emitters.remove(agentId);
         });
 
         emitter.onError((e) -> {
             emitter.completeWithError(e);
-            emitters.remove(sessionId);
+            emitters.remove(agentId);
         });
 
-        emitters.put(sessionId, emitter);
+        emitters.put(agentId, emitter);
         return emitter;
     }
 }
