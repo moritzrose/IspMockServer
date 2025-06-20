@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1" xml:lang="de-DE">
+
+	<!-- Welcome message -->
+	<form>
+		<field name="welcome">
+			<block>
+				<prompt>Willkommen bei der Sparkasse Neustadt</prompt>
+				<goto next="getName">
+			</block>
+		</field>
+	</form>
+
+	<!-- Get user's name -->
+	<form id="getName">
+		<field name="userName">
+			<prompt>Bitte nennen Sie jetzt Ihren Namen</prompt>
+		</field>
+		<block>
+			<prompt>Hallo <value expr="userName"/></prompt>
+			<goto next="#askPin"/>
+		</block>
+	</form>
+
+	<!-- Get PIN -->
+	<form id="askPin">
+		<field name="pin" type="digits">
+			<prompt>Bitte nennen Sie mir zur Authentifizierung jetzt Ihre PIN</prompt>
+			<filled>
+				<prompt>Folgendes habe ich verstanden <value expr=\"pin\"/></prompt>
+			</filled>
+		</field>
+	</form>
+</vxml>
