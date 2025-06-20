@@ -40,6 +40,12 @@ public class IvrController {
         return readVxml("./src/main/resources/vxml/helloworld2.vxml");
     }
 
+    @GetMapping("/multpartbuiltin")
+    public String vxmlMultpartBuiltin()
+    {
+        return readVxml("./src/main/resources/vxml/multpart_builtin.vxml");
+    }
+
     @GetMapping("/multpartdtmf")
     public String vxmlMultpartDtmf()
     {
