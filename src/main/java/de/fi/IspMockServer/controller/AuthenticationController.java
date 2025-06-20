@@ -71,8 +71,6 @@ public class AuthenticationController {
             softphoneService.removeButtonPanel(agentId);
             session.invalidate();
             return "login";
-            //SseController.emitter.get(sessionId).complete();
-            //SseController.emitter.remove(sessionId);
         } catch (Exception e) {
             LOGGER.error("logout: ", e);
             return "error";
