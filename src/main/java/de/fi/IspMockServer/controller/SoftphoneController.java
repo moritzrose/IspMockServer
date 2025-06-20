@@ -29,6 +29,8 @@ import java.util.Stack;
 @RequestMapping("/softphone")
 public class SoftphoneController {
 
+    public static final String COMMAND_EXECUTED = "command_executed";
+    public static final String NO_DATA = "no-data";
     private static final Logger LOGGER = LoggerFactory.getLogger(SoftphoneController.class);
 
     private final SoftphoneService softphoneService;
@@ -66,6 +68,8 @@ public class SoftphoneController {
                 return;
             }
             softphoneService.executeCommand(userSession, command);
+            SseController.emitters.get(agentId).emit(COMMAND_EXECUTED, NO_DATA);
+
         } catch (Exception e) {
             LOGGER.error("command: ", e);
         }

@@ -23,12 +23,12 @@
 </div>
 <div class="status"></div>
 
-<h3>Softphone</h3>
-<div th:attr="hx-get=@{/softphone/panel/{agentId}(agentId=${agentId})}"
-     hx-target=".panel"
-     hx-trigger="load">
-</div>
-<div class="panel"></div>
+    <h3>Softphone</h3>
+    <div th:attr="hx-get=@{/softphone/panel/{agentId}(agentId=${agentId})}"
+         hx-target=".panel"
+         hx-trigger="load, sse:command_executed">
+    </div>
+    <div class="panel"></div>
 
 <h3>Http-Responses</h3>
 <div th:attr="hx-get=@{/softphone/responses/{agentId}(agentId=${agentId})}"
