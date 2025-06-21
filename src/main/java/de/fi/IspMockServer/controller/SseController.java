@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/sse")
+@RequestMapping("/sse-stream")
 public class SseController {
 
     public static final Map<String, CustomSseEmitter> emitters = new HashMap<>();
