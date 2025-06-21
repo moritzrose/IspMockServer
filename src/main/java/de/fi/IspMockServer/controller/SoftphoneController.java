@@ -49,7 +49,7 @@ public class SoftphoneController {
             final String agentId = (String) session.getAttribute("agentId");
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
-                LOGGER.error("event: userSession is null");
+                LOGGER.error("home: userSession is null");
                 return "error";
             }
             model.addAttribute("agentId", agentId);
@@ -64,11 +64,11 @@ public class SoftphoneController {
         try {
             final UserSession userSession = sessionService.findUserSession(agentId);
             if (userSession == null) {
-                LOGGER.error("event: userSession is null");
+                LOGGER.error("command: userSession is null");
                 return;
             }
             softphoneService.executeCommand(userSession, command);
-            SseController.emitters.get(agentId).emit(COMMAND_EXECUTED, NO_DATA);
+            SseController.emitters.get(agentId).emit(COMMAND_EXECUTED, command);
 
         } catch (Exception e) {
             LOGGER.error("command: ", e);

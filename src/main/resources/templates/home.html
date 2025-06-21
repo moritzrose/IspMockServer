@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<div class="softphoneMock" th:attr="hx-sse=@{connect:/sse/{agentId}(agentId=${agentId})}">
+<div class="softphoneMock" hx-ext="sse" th:attr="hx-sse=@{/sse-stream/{agentId}(agentId=${agentId})}">
 
     <button th:attr="hx-post=@{/logout/{agentId}(agentId=${agentId})}"
             hx-trigger="click"
